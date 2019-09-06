@@ -1,0 +1,24 @@
+Where to find documentation?   ruby-doc.com
+
+while loop location?   https://ruby-doc.org/docs/keywords/1.9/Object.html#method-i-while
+
+return of a while loop?   value of last expression to be evaluated the last time, or nil
+
+return of a break?   if given an argument, returns the value of that argument at the break
+
+large numbers?   can be written with underscores in place of commas - 1_000_000
+
+symbol syntax?   :ben
+
+string doc?   https://ruby-doc.org/core-2.4.0/String.html
+
+right justify?   str.rjust(#_of_spaces_to_justify)
+
+methods w/o args?  new = "xyz".upcase
+
+insert?   a.insert(3, 5, 6, 7)
+
+optional args?   ["abc", "def", "ghi,jkl", "mno", "pqr,stu", "vwx", "yz"], - splits on whitespace by default
+		 ["abc def ghi", "jkl mno pqr", "stu vwx yz"], splits on delimiter ','
+		 ["abc def ghi", "jkl mno pqr,stu vwx yz"] - limited to two results
+ 

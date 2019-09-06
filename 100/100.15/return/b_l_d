@@ -1,0 +1,12 @@
+1) Breakfast
+
+2) Evening - implicit return
+
+3) Breakfast - the method returns and stops before getting to dinner
+
+4) Dinner \n Breakfast - prints dinner as part of method, returns breakfast to be printed by #put
+
+5) Dinner - last line is a #put which prints dinner but returns nil to the outer #put 
+	correction - the #p method will also print the nil after
+
+6) Breakfast - the method returns Breakfast to the outer #puts, then exits

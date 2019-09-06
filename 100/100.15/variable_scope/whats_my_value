@@ -1,0 +1,19 @@
+1) 7, integers are immutable, and inner scope doesn't affect outer local variable
+
+2) 7, the block reads a as the parameter and argument, not the outer variable
+
+3) 7, a is still passed in only as an argument, and not mutated outside the block
+
+4) Xy_z, strings are mutable objects, and the method [] is a destructive method
+
+5) Xyzzy, the method merely reassigns the string, which doesn't mutate the outer value
+
+6) undefined local variable - since the outer a is not accessible within the block
+
+7) 3, method invocation can access and mutate outer scope, while method definition cannot
+
+8) undefined local variabl - the a assigned within the method isn't accessible outside the method
+
+9) 7, the a within the method is a parameter, not the accessing of the outer variable a
+
+10) error - the variable a, which is accessible w/in the method invocation, is not accessible w/in the surrounding method definition. 
