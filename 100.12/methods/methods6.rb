@@ -1,1 +1,0 @@
-# calculate_product had two parameters defined on line 1, when it was called on  line 4,  only one argument was passed
