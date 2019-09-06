@@ -1,0 +1,26 @@
+1)
+
+0
+1
+2
+3
+4
+5 - value is the return value of the .times method 
+
+2)
+
+0
+1
+2
+3
+4
+10 - value is the last return line of the counnt_sheep method
+
+3)
+
+0
+1
+2
+2 - correction nil - the return is not from the .times method, but from the return statement
+
+ 
