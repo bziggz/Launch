@@ -1,5 +1,3 @@
-
-
 require "yaml"
 MESSAGES = YAML.load_file("calculator_config.yml")
 
@@ -9,14 +7,13 @@ end
 
 def message(key, language)
   if language == '1'
-    message = MESSAGES["english"][key]
+    MESSAGES["english"][key]
   elsif language == '2'
-    message = MESSAGES["spanish"][key]
-  else 
-    message = MESSAGES["french"][key]
+    MESSAGES["spanish"][key]
+  else
+    MESSAGES["french"][key]
   end
 end
-    
 
 def valid_number?(num)
   num =~ /^\d*\.?\d*$/ || num =~ /^\d+$/
