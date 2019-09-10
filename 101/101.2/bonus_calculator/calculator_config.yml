@@ -11,12 +11,14 @@ english:
   invalid_number: "That is not a valid number."
   operator_prompt: "What operation should I perform? \n 1) add \n 2) subtract \n 3) multiply \n 4) divide"
   invalid_operator: "Must choose 1, 2, 3, or 4"
+  zero_divide: "Cannot divide by zero. Please try again."
   adding: "Adding the two numbers..."
   subtracting: "Subtracting the second number from the first number..."
   multiplying: "Multiplying the two numbers..."
   dividing: "Dividing the first number by the second number..."
   result:  "The result is "
-  again: "Want to try that again? (press Y if you do)"
+  again: "Want to try that again? (press Y if you do, N to exit)"
+  invalid_answer: "Invalid entry. Please enter Y to continue, or N to exit."
   goodbye: "Go Buckeyes!"
 
 spanish:
@@ -28,12 +30,14 @@ spanish:
   invalid_number: "Ese no es un número válido."
   operator_prompt: "¿Qué operación debo realizar? \n 1) añadir \n 2) sustraer \n 3) multiplicar \n 4) dividir"
   invalid_operator: "Debe elegir 1, 2, 3 o 4"
+  zero_divide: "No se puede dividir por cero. Inténtalo de nuevo."
   adding: "Sumando los dos números ..."
   subtracting: "Restando el segundo número del primer número ..."
   multiplying: "Multiplicando los dos números ..."
   dividing: "Dividiendo el primer número por el segundo número ..."
   result:  "El resultado es "
-  again: "¿Quieres intentarlo de nuevo? (presione Y si lo hace)"
+  again: "¿Quieres intentarlo de nuevo? (presione Y si lo hace, N para salir)"
+  invalid_answer: "Entrada invalida. Ingrese Y para continuar o N para salir."
   goodbye: "Go Buckeyes!"
 
 french:
@@ -45,12 +49,14 @@ french:
   invalid_number: "Ce n'est pas un nombre valide."
   operator_prompt: "Quelle opération dois-je effectuer? \n 1) ajouter \n 2) soustraire \n 3) multiplier \n 4) diviser"
   invalid_operator: "Doit choisir 1, 2, 3 ou 4"
+  zero_divide: "Impossible de diviser par zéro. Veuillez réessayer."
   adding: "Ajouter les deux nombres ..."
   subtracting: "Soustraire le deuxième nombre du premier nombre ..."
   multiplying: "Multiplier les deux nombres ..."
   dividing: "Diviser le premier nombre par le deuxième nombre ..."
   result:  "Le résultat est "
-  again: "Voulez-vous essayer à nouveau? (appuyez sur Y si vous le faites)"
+  again: "Voulez-vous essayer à nouveau? (appuyez sur Y si vous le faites, N pour sortir)"
+  invalid_answer: "Entrée invalide. Veuillez entrer Y pour continuer ou N pour sortir."
   goodbye: "Allez Buckeyes!"
 
 
