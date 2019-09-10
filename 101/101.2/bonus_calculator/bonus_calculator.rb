@@ -15,7 +15,7 @@ def message(key, language)
   end
 end
 
-def get_language_choice
+def retrieve_language_choice
   loop do
     prompt(MESSAGES["language_select"])
     language = gets.chomp
@@ -51,7 +51,7 @@ def greet(language)
       prompt(message("hello", language) + name + "!")
       break
     end
-    
+
     prompt(message("invalid_name", language))
   end
 end
@@ -60,7 +60,7 @@ def valid_number?(num)
   num =~ /^\-?\d*\.?\d*$/ || num =~ /^\-?\d+$/
 end
 
-def get_number(msg, language)
+def retrieve_number(msg, language)
   loop do
     prompt(message(msg, language))
     number = gets.chomp
@@ -73,7 +73,7 @@ def get_number(msg, language)
   end
 end
 
-def get_operator(language)
+def retrieve_operator(language)
   loop do
     prompt(message("operator_prompt", language))
     operator = gets.chomp
@@ -104,7 +104,7 @@ def do_the_math(num1, num2, operator)
   result
 end
 
-def get_continue_answer(msg, language)
+def retrieve_continue_answer(msg, language)
   loop do
     prompt(message(msg, language))
     answer = gets.chomp.downcase
@@ -128,7 +128,7 @@ end
 prompt(MESSAGES["welcome"])
 
 language = '1'
-get_language_choice()
+retrieve_language_choice()
 
 greet(language)
 
@@ -138,11 +138,11 @@ loop do # main loop
   operator = ""
 
   loop do
-    number1 = get_number("first_number", language)
+    number1 = retrieve_number("first_number", language)
 
-    number2 = get_number("second_number", language)
+    number2 = retrieve_number("second_number", language)
 
-    operator = get_operator(language)
+    operator = retrieve_operator(language)
 
     break unless number2.to_i == 0 && operator == "4"
     prompt(message("zero_divide", language))
@@ -154,9 +154,8 @@ loop do # main loop
 
   prompt(message("result", language) + result.to_s + ".")
 
-  answer = get_continue_answer("again", language)
+  answer = retrieve_continue_answer("again", language)
   break unless continue?(answer)
 end
 
 prompt(message("goodbye", language))
-
