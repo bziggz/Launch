@@ -45,21 +45,19 @@ def greet(language)
     prompt(message("ask_name", language))
     name = gets.chomp
 
-    if name =~ (/^\S.*\S$/)
+    name.strip!
+
+    unless name.empty?
       prompt(message("hello", language) + name + "!")
       break
-    else
-      prompt(message("invalid_name", language))
     end
+    
+    prompt(message("invalid_name", language))
   end
 end
 
 def valid_number?(num)
   num =~ /^\-?\d*\.?\d*$/ || num =~ /^\-?\d+$/
-end
-
-def valid_answer?(ans)
-  ["y", "yes", "yeah", "sure", "n", "no", "nope", "nah"].include?(ans)
 end
 
 def get_number(msg, language)
@@ -106,7 +104,7 @@ def do_the_math(num1, num2, operator)
   result
 end
 
-def continue?(msg, language)
+def get_continue_answer(msg, language)
   loop do
     prompt(message(msg, language))
     answer = gets.chomp.downcase
@@ -117,6 +115,14 @@ def continue?(msg, language)
       prompt(message("invalid_answer", language))
     end
   end
+end
+
+def valid_answer?(ans)
+  ["y", "yes", "yeah", "sure", "n", "no", "nope", "nah"].include?(ans)
+end
+
+def continue?(ans)
+  ["y", "yes", "yeah", "sure"].include?(ans)
 end
 
 prompt(MESSAGES["welcome"])
@@ -148,8 +154,8 @@ loop do # main loop
 
   prompt(message("result", language) + result.to_s + ".")
 
-  answer = continue?("again", language)
-  break unless ["y", "yes", "yeah", "sure"].include?(answer)
+  answer = get_continue_answer("again", language)
+  break unless continue?(answer)
 end
 
 prompt(message("goodbye", language))
