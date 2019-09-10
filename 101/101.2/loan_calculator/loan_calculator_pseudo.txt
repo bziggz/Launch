@@ -1,0 +1,50 @@
+# START
+
+# READ from yaml
+
+# PRINT welcome the user
+# GET language selection
+#   SUBPROCESS language validation
+
+# PRINT ask. user name
+# GET. user name
+#   SUBPROCESS name validation
+
+#   ***
+
+# PRINT ask total loan. amount
+# GET loan amount
+#   SUBPROCESS loan. amount validation
+
+# PRINT ask APR 
+# GET APR
+#   SUBPROCESS. APR validation
+
+# PRINT ask loan duration
+# GET loan. duration
+#   SUBPROCESS loan duration. validation
+
+# convert APR to monthly interest rate (APR / 12)
+# convert loan duration to months if not already (loan duration / 12)
+
+# PRINT review of loan amount, monthly interest rate, loan duration in months
+
+
+# APPLY:
+# m = p * (j / (1 - (1 + j)**(-n)))
+# m = monthly payment
+# p = loan amount
+# j = monthly interest rate
+# n = loan duration in months
+
+
+# OUTPUT PRINT monthly payment amount
+
+# PRINT ask if they want to try again
+# GET.  answer
+# IF answer == yes
+#   back to ***
+# ELSE
+#   PRINT goodbye
+
+# END
