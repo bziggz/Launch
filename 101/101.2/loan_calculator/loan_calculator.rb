@@ -29,8 +29,7 @@ def retrieve_language_selection
   end
 end
 
-def greet(language)
-  name = ""
+def retrieve_user_name(language)
   loop do
     prompt("name", language)
     name = gets.chomp
@@ -38,16 +37,19 @@ def greet(language)
     name.strip!
 
     unless name.empty?
-      puts messages("hello", language) + name + "!"
-      break
+      return name
     end
 
     prompt("invalid", language)
   end
 end
 
+def display_greeting(name, language)
+  puts messages("hello", language) + name + "!"
+end
+
 def valid_loan_amount?(loan_amount)
-  !(loan_amount =~ /\-/) &&
+  loan_amount.delete(",$").to_f > 0 &&
     (loan_amount =~ /^\$?\d{1,3}(\,\d{3})*(\.\d{,2})?$/ ||
     loan_amount =~ /^\$?\d*(\.?\d{,2})?$/)
 end
@@ -61,8 +63,12 @@ def retrieve_loan_amount(language)
       return loan_amount.delete(",$")
     end
 
-    prompt("invalid", language)
+    prompt("invalid_dollar", language)
   end
+end
+
+def valid_apr?(apr)
+  apr =~ /^\d*\.?\d*$/ && apr.delete(",").to_f >= 0
 end
 
 def retrieve_apr(language)
@@ -70,7 +76,7 @@ def retrieve_apr(language)
     prompt("apr", language)
     apr = gets.chomp.strip
 
-    if apr =~ /^\d*\.?\d*$/ && !(apr =~ /\-/)
+    if valid_apr?(apr)
       return apr
     end
 
@@ -78,17 +84,25 @@ def retrieve_apr(language)
   end
 end
 
+def valid_duration?(duration)
+  duration =~ /^\d*\.?\d*$/ && duration.delete(",").to_f > 0
+end
+
 def retrieve_loan_duration(language)
   loop do
     prompt("loan_duration", language)
     duration = gets.chomp.strip
 
-    if duration =~ /^\d*\.?\d*$/ && !(duration =~ /\-/)
+    if valid_duration?(duration)
       return duration
     end
 
-    prompt("invalid", language)
+    prompt("invalid_number", language)
   end
+end
+
+def zero?(num_string)
+  num_string.to_f == 0
 end
 
 def zero_cents_enator(num_string)
@@ -134,6 +148,10 @@ def comma_nator(num)
 end
 
 def currency_formatter(num_string)
+  if zero?(num_string)
+    num_string = "0.0"
+  end
+
   num_string = num_string.to_s
   num_string = pre_zero_enator(num_string)
   num_string = zero_cents_enator(num_string)
@@ -141,23 +159,35 @@ def currency_formatter(num_string)
 end
 
 def number_formatter(num_string)
+  if zero?(num_string)
+    num_string = "0.0"
+  end
+
   num_string = num_string.to_s
   num_string = pre_zero_enator(num_string)
   comma_nator(num_string)
 end
 
+def display_confirmation(loan_amount, apr, duration, language)
+  prompt("confirmation", language)
+
+  puts "#{messages('confirm_amount', language)} "\
+        "#{currency_formatter(loan_amount)}"
+
+  puts "#{messages('confirm_apr', language)} "\
+        "#{number_formatter(apr)}%"
+
+  puts "#{messages('confirm_duration', language)} "\
+        "#{number_formatter(duration)} "\
+        "#{messages('months', language)}"
+
+  prompt("correct", language)
+end
+
 def retrieve_confirmation(loan_amount, apr, duration, language)
   loop do
-    prompt("confirmation", language)
-    puts "#{messages('confirm_amount', language)} "\
-          "#{currency_formatter(loan_amount)}"
-    puts "#{messages('confirm_apr', language)} #{number_formatter(apr)}%"
-    puts "#{messages('confirm_duration', language)} "\
-          "#{number_formatter(duration)} "\
-          "#{messages('months', language)}"
-
-    prompt("correct", language)
-    answer = gets.chomp
+    display_confirmation(loan_amount, apr, duration, language)
+    answer = gets.chomp.downcase
 
     if valid_answer?(answer)
       return answer
@@ -180,7 +210,11 @@ def calculate_mpr(apr)
 end
 
 def calculate_monthly_payment(loan_amount, mpr, duration)
-  loan_amount.to_f * (mpr / (1 - (1 + mpr)**(-duration.to_f)))
+  if mpr == 0
+    loan_amount.to_f / duration.to_f
+  else
+    loan_amount.to_f * (mpr / (1 - (1 + mpr)**(-duration.to_f)))
+  end
 end
 
 def calculate_total(duration, monthly_payment)
@@ -205,7 +239,7 @@ end
 def retrieve_another_calc_choice(language)
   loop do
     prompt("again", language)
-    answer = gets.chomp
+    answer = gets.chomp.downcase
 
     if valid_answer?(answer)
       return answer
@@ -215,12 +249,17 @@ def retrieve_another_calc_choice(language)
   end
 end
 
+def clear_screen
+  Gem.win_platform? ? (system "cls") : (system "clear")
+end
+
 puts MESSAGES["welcome"]
 
 language = "1"
 language = retrieve_language_selection
 
-greet(language)
+name = retrieve_user_name(language)
+display_greeting(name, language)
 
 loop do # MAIN LOOP
   loan_amount = ""
@@ -234,6 +273,7 @@ loop do # MAIN LOOP
 
     answer = retrieve_confirmation(loan_amount, apr, duration, language)
     break if continue?(answer)
+    clear_screen()
   end
 
   mpr = calculate_mpr(apr)
@@ -254,6 +294,7 @@ loop do # MAIN LOOP
 
   answer = retrieve_another_calc_choice(language)
   break unless continue?(answer)
+  clear_screen()
 end
 
 prompt("goodbye", language)
