@@ -84,29 +84,29 @@ def display_results(player, computer)
   end
 end
 
-def update_score(hsh, game_winner)
-  if hsh.include?(game_winner)
-    hsh[game_winner] += 1
+def update_score(scorecard, game_winner)
+  if scorecard.include?(game_winner)
+    scorecard[game_winner] += 1
   end
 end
 
-def display_game_score(hsh)
-  prompt("Score: #{hsh.values.join('-')}")
+def display_game_score(scorecard)
+  prompt("Score: #{scorecard.values.join('-')}")
 end
 
-def win_match?(hsh, winning_score)
-  hsh.value?(winning_score)
+def win_match?(scorecard, winning_score)
+  scorecard.value?(winning_score)
 end
 
-def determine_match_winner(hsh, winning_score)
-  hsh.key(winning_score)
+def determine_match_winner(scorecard, winning_score)
+  scorecard.key(winning_score)
 end
 
-def display_match_winner(winner, hsh)
+def display_match_winner(winner, scorecard)
   if winner == :player
-    prompt("You win #{hsh.values.join('-')}!")
+    prompt("You win #{scorecard.values.join('-')}!")
   else
-    prompt("You lose #{hsh.values.join('-')}.")
+    prompt("You lose #{scorecard.values.join('-')}.")
   end
 end
 
@@ -133,10 +133,10 @@ end
 
 loop do
   scorecard = { player: 0, computer: 0 }
-  winning_score = retrieve_game_length()
+  winning_score = retrieve_game_length
 
   loop do
-    choice = retrieve_choice()
+    choice = retrieve_choice
 
     computer_choice = VALID_CHOICES.values.sample
 
@@ -148,6 +148,8 @@ loop do
 
     break if win_match?(scorecard, winning_score)
 
+    clear_screen
+
     display_game_score(scorecard)
   end
 
@@ -156,7 +158,7 @@ loop do
   display_match_winner(winner, scorecard)
 
   break unless rematch?
-  clear_screen()
+  clear_screen
 end
 
 prompt("Thanks for playing! Go Buckeyes!")
