@@ -1,0 +1,23 @@
+CLASS V INSTANCE) File::path is a class method, while File#path is an instance
+method, and is called on an individual object
+
+OPTIONAL ARGUMENTS) First day of the julian calender, then first day of the
+year, then first day of the month of the year, then actual input date
+
+DEFAULT MIDDLE ARGS) [4, 5, 3, 6] - first arg goes to a, last arg goes to d,
+middle arg goes to b, which leaves c as its default
+
+MANDATORY BLOCKS) a.bsearch { |x| x > 8 }
+
+MULTIPLE SIGNATURES) IndexError, "beats me", 49
+
+KEYWORD ARGUMENTS) 5 8, range_start.step(to: range_end, by: step_size) {block}
+
+PARENT CLASS) puts s.public_methods(false).inspect
+
+INCLUDED MODULES) puts a.min(number_of_values_to_return)
+
+RABBIT HOLE) http://ruby-doc.org/stdlib/libdoc/psych/rdoc/Psych.html#method-c-load_file
+Psych class is all about working with YAML
+
+
