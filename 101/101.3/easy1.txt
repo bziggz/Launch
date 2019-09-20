@@ -1,0 +1,38 @@
+1)  1
+    2
+    2
+    3
+
+    #uniq isn't a destructive method
+
+2)  ! - two meanings: either indicative of a destructive method, 
+        or used to negate a follwing expression
+
+    ? - indicates a boolean method or conditional, or 0-1 times in a
+        regexp
+
+    1) "not equal to" in a conditional
+    2) "not" user_name, or to give user_name a falsy value
+    3) if applicable, to make the method destructive, or mutating
+    4) indicates a ternery conditional
+    5) indicates a boolean expression
+    6) turns the folllowing object into it's boolean equivalent
+
+3)  advice.gsub!(/important/, "urgent") - g makes it replace all
+    instances
+
+4)  #delete_at refers to the index
+    #delete refers to the value itself
+
+5)  (10..100).include?(42) or (10..100).cover?(42)
+
+6)  famous_words = "Four score and " + famous_words
+    famous_words.insert(0, "Four score and ")
+    famous_words.prepend("Four score and ")
+
+7)  42
+
+8)  flinstones.flatten!
+
+9)  flintstones = flintstones.to_a[2]
+    flintstones.assoc("Barney")

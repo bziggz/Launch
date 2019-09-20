@@ -1,0 +1,36 @@
+1)  10.times { |x| puts "The Flintstones Rock!".rjust(x += 21) }
+    **10.times { |num| puts (" " * num) + "The Flintstones Rock!" }
+
+2)  TypeError - fixnum into string
+    puts "the value of 40 + 2 is " + (40 + 2).to_s
+    puts "the value of 40 + 2 is #{(40 + 2)}"
+
+3)  def factors(number)
+      divisor = number
+      factors = []
+      while divisor > 0 do
+        factors << number / divisor if number % divisor == 0
+        divisor -= 1
+      end
+      factors
+    end
+
+    1) that expression determines if the divisor is a factor or not
+    2) makes sure the return is the factors array
+
+4)  rolling_buffer1 will mutate the call argument
+    rolling_buffer2 will return the modified array, but not alter the original
+
+5)  limit isn't accessible within the method's scope.
+    either declare the limit within the method, or pass it in as a third parameter/argument
+
+6)  34
+
+7)  yes. index assignment is mutating
+
+8)  rps(rps(rps("rock", "paper"), rps("rock", "scissors")), "rock") becomes
+    rps(rps("paper", "rock"), "rock")                               becomes
+    rps("paper", "rock")                                            resolves
+    "paper"
+
+9)  "no"
