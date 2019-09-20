@@ -1,0 +1,66 @@
+1)  assigns object_id to each outer object
+
+    BLOCK STARTS
+
+      outer object and object_id is the same indide the block
+
+      REASIGNMENT
+
+      after reassigment, both outer object and object id are different 
+
+      the inner objects and object ids are the same as the NEW outer versions
+
+    BLOCK ENDS
+
+    reassignment sticks to the outer objects and ids
+
+    variables assigned within the block are not accessible outside
+
+
+2)  FUN WITH IDS STARTS
+
+    outer objects and ids are assigned
+
+    ILLUSTRATIVE METHOD IS CALLED
+
+      outer objects remain the same but are given new ids for within the method
+
+      REASSIGNMENT
+
+      outer objects are reassigned and but keep the same new ids
+
+      inner objects are assigned with same new ids as outer
+
+    ILLUSTRATIVE METHOD ENDS
+
+    outer objects and ids remain the same, having not been altered by the method
+
+    inner objects and ids are gone now that the illustrative method is done
+    
+
+3)  pumpkins -- because += is a non-destructive method
+    ["pumpkins", "rutabega"] -- because << is a destructive method
+
+
+4)  pumpkinsrutabega -- same as #3, << is destructive
+    ["pumpkins"] -- same same but for reassignment
+
+
+5)  def tricky_method(a_string_param, an_array_param)
+      a_string_param += "rutabaga"
+      an_array_param += "rutabaga"
+
+      return a_string_param, an_array_param
+    end
+
+    my_string = "pumpkins"
+    my_array = ["pumpkins"]
+    my_string, my_array = tricky_method(my_string, my_array)
+
+    puts "My string looks like this now: #{my_string}"
+    puts "My array looks like this now: #{my_array}"
+    
+
+6)  def color_valid(color)
+      color == "blue" || color == "green"
+    end
