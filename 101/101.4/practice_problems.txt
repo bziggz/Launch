@@ -1,0 +1,19 @@
+1)  [1, 2, 3] - "hi" is truthy, and is the return value of the contained block
+
+2)  2 - using documentation, count returns the number of elements that meet the block criteria
+
+3)  [1, 2, 3] - opposite of select, and puts returns false
+
+4)  { a: => "ant", b: => "bear", c: => "cat" } - returns a hash with the key as the first letter of the string
+
+5)  removes first element and returns it as an array [key, value] - per documentation
+
+6)  11 - pop returns the last element from the array, then size evaluates the element
+
+7)  true - evaluates the last line in the block (num.odd?)
+
+8)  [1, 2] - per documentation, take(n) returns the first n elements
+
+9)  [nil, 'bear'] - map returns a value-filled array, and the value of a false if is nil
+
+10) [1, nil, nil] - map returns an array of block returns, and for [2, 3] that is nil

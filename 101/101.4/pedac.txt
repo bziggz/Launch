@@ -1,0 +1,6 @@
+INPUT: string
+OUTPUT: array of strings, where each string is a palindrome contained in given string
+RULES:
+    EXPLICIT REQUIREMENTS: 
+      - every palindrome must be in the return array
+      - palindromes are case sensitive and whitespace sensative

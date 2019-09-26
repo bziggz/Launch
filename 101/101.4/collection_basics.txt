@@ -1,0 +1,30 @@
+STRING ELEMENT REFERENCE) str["grass"]
+                          str[4, 5]
+                          str.slice(4, 5)
+
+ARRAY ELEMENT REFERENCE)  ['c', 'd', 'e']
+                          'c'
+
+NEGATIVE INDICES)         nil
+                          nil
+
+CONVERSION)               arr.join(' ')
+                         
+                          { :name => 'Joe', :age => 10, :favorite_color => 'blue' }
+
+STRING ELEMENT ASSIGN)    str[6] = 'F'
+                          str[15] = 'C'
+                          str[21] = 'I'
+                          str[24] = 'B'
+
+ARRAY ELEMENT ASSIGNMENT) arr[1] += 1
+                          arr[2] += 1
+                          arr[3] += 1
+                          arr[4] += 1
+
+HASH ELEMENT ASSIGNMENT)  hsh[:apple] = "fruit"
+                          hsh[:carrot] = "vegetable"
+                          hsh[:pear] = "fruit"
+                          hsh[:broccoli] = "vegetable"
+
+                          
