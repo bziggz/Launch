@@ -120,7 +120,7 @@ def score_the_game(brd)
 end
 
 def score_selector(player, scores)
-  player == "The Computer" ? scores.min : scores.max
+  player == "The Computer" ? scores.max : scores.min
 end
 
 def generate_move_scorecard(brd)
@@ -172,7 +172,7 @@ def computer_turn!(brd)
 end
 
 def initialize_board
-  #new_board = { 1 => "O", 2 => " ", 3 => "X", 4 => "X", 5 => " ", 6 => "X", 7 => " ", 8 => "O", 9 => "O" }
+  # new_board = { 1 => "O", 2 => " ", 3 => "X", 4 => "X", 5 => " ", 6 => "X", 7 => " ", 8 => "O", 9 => "O" }
   
   new_board = {}
   (1..9).each { |num| new_board[num] = INITIAL_MARKER }
