@@ -102,7 +102,7 @@ end
                 return max value from scores list (equivalent to level (player = comp) above asking for max)
               IF player == computer
                 return min value from scores list (equivalent to level (player = human) above asking for min)
-                
+
         RETURN value to #computer_turn
 
   SELECT key with best possible score
@@ -153,6 +153,7 @@ def minimax(brd, move, player)
     available_moves.each do |move|
       scores << minimax(temp_board, move, alternate_player(player))
     end
+
   end
   #binding.pry
   score_selector(player, scores)
@@ -172,8 +173,10 @@ end
 
 def initialize_board
   #new_board = { 1 => "O", 2 => " ", 3 => "X", 4 => "X", 5 => " ", 6 => "X", 7 => " ", 8 => "O", 9 => "O" }
-  #new_board = {}
-  #(1..9).each { |num| new_board[num] = INITIAL_MARKER }
+  
+  new_board = {}
+  (1..9).each { |num| new_board[num] = INITIAL_MARKER }
+
   new_board
 end
 
