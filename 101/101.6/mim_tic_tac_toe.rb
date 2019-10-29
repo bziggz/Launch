@@ -120,7 +120,7 @@ def score_the_game(brd)
 end
 
 def score_selector(player, scores)
-  player == "The Computer" ? scores.max : scores.min
+  player == "The Computer" ? scores.min : scores.max
 end
 
 def generate_move_scorecard(brd)
