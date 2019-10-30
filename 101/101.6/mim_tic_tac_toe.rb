@@ -1,14 +1,11 @@
-require "pry"
-require "pry-byebug"
-
 INITIAL_MARKER = " "
-PLAYER_MARKER = "O"
-COMP_MARKER = "X"
+PLAYER_MARKER = "X"
+COMP_MARKER = "O"
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                 [[1, 5, 9], [3, 5, 7]]
 CENTER_SQUARE = 5
-FIRST_PLAYER = "The Computer"
+FIRST_PLAYER = "choose"
 
 def prompt(str)
   puts "=> #{str}"
@@ -22,7 +19,7 @@ def retrieve_match_length
   answer = nil
 
   loop do
-    prompt "How many games needed to win the match?"
+    prompt "How many games do you want to play?"
     answer = gets.chomp.strip
     break if answer =~ /^[0-9]+$/
     prompt "Invalid choice."
@@ -36,9 +33,9 @@ end
 def display_board(hsh1, hsh2)
   clear_screen
   puts "---Current Game Score---"
-  puts "The Human: #{hsh2['The Human']} ||| The Computer: #{hsh2['The Computer']}"
+  puts "You: #{hsh2['You']} ||| The Computer: #{hsh2['The Computer']}"
   puts ""
-  puts "The Human is X. Computer is O."
+  puts "You is X. Computer is O."
   puts ""
   puts "     |     |"
   puts "  #{hsh1[1]}  |  #{hsh1[2]}  |  #{hsh1[3]}"
@@ -56,124 +53,7 @@ end
 # rubocop:enable Metrics/AbcSize
 # rubocop:enable Metrics/MethodLength
 
-
-=begin
-
-#computer_turn
-  INPUT current board and computer's turn
-  CREATE a hash of available moves => nil (#generate_move_scorecard)
-  FOR EACH move in available moves, 
-    generate a score using #minimax
-
-      #minimax
-        INPUT current board, current move in question, and current player
-        CREATE duplicate board hash to manipulate
-        CREATE a list to hold the outcome scores for this branch
-        UPDATE duplicate board[current move] = player's marker
-        EVALUATE updated duplicate board using #score_the_game
-
-          #score_the_game
-            EVALUATE board for a winner
-              IF winner == computer
-                return 10
-              ELSIF winner == human
-                return 0
-              ELSIF nil
-                EVALUATE board full?
-                  IF board is full
-                    return 0
-                  ELSE nil
-              ELSE 
-                return nil
-
-        IF there is an outcome, 
-          append outcome to list of scores
-        IF #score_the_game == nil
-          alternate player
-          create a list of remaining available moves
-          FOR EACH move in available moves
-            recursively run #minimax(updated duplicate board, move, alternated player)
-
-        ONCE all available moves return an outcome
-          EVALUATE scores list using #score_selector
-            
-            #score_selector
-              IF player == human
-                return max value from scores list (equivalent to level (player = comp) above asking for max)
-              IF player == computer
-                return min value from scores list (equivalent to level (player = human) above asking for min)
-
-        RETURN value to #computer_turn
-
-  SELECT key with best possible score
-  UPDATE current board with COMP_MARKER at said key
-=end
-
-def score_the_game(brd)
-  outcome = detect_winner(brd)
-  case 
-  when outcome == "The Computer" then 10
-  when outcome == "The Human" then -10
-  when board_full?(brd) then 0
-  else nil
-  end
-end
-
-def score_selector(player, scores)
-  player == "The Computer" ? scores.min : scores.max
-end
-
-def generate_move_scorecard(brd)
-  possible_move_hash = {}
-  empty_squares(brd).each { |move| possible_move_hash[move] = nil }
-  possible_move_hash
-end
-
-def temp_piece(player)
-  player == "The Human" ? PLAYER_MARKER : COMP_MARKER
-end
-
-def alternate_player(player)
-  player == "The Human" ? "The Computer" : "The Human"
-end
-
-def minimax(brd, move, player)
-  temp_board = brd.dup
-  scores = []
-
-  temp_board[move] = temp_piece(player)
-
-  score = score_the_game(temp_board)
-
-  if !!score
-    scores << score
-  else
-    available_moves = empty_squares(temp_board)
-
-    available_moves.each do |move|
-      scores << minimax(temp_board, move, alternate_player(player))
-    end
-
-  end
-  #binding.pry
-  score_selector(player, scores)
-end
-
-def computer_turn!(brd)
-  move_scores = generate_move_scorecard(brd)
-  available_moves = move_scores.keys
-
-  available_moves.each do |move|
-    move_scores[move] = minimax(brd, move, "The Computer")
-  end
-  #binding.pry
-  square = move_scores.key(move_scores.values.max) 
-  brd[square] = COMP_MARKER
-end
-
 def initialize_board
-  # new_board = { 1 => "O", 2 => " ", 3 => "X", 4 => "X", 5 => " ", 6 => "X", 7 => " ", 8 => "O", 9 => "O" }
-  
   new_board = {}
   (1..9).each { |num| new_board[num] = INITIAL_MARKER }
 
@@ -194,7 +74,7 @@ def retrieve_first_player
   answer = ''
   loop do
     prompt %(Who should want to go first?
-      1 - Always The Human
+      1 - Always You
       2 - Always The Computer
       3 - The Winner of the Last Game
       4 - The Loser of the Last Game)
@@ -208,7 +88,7 @@ end
 
 def first_player(answer, brd)
   case answer
-  when "1" then "The Human"
+  when "1" then "You"
   when "2" then "The Computer"
   when "3" then detect_winner(brd)
   when "4" then alternate_player(detect_winner(brd))
@@ -219,7 +99,7 @@ def starting_player(answer)
   if answer == "2"
     "The Computer"
   else
-    "The Human"
+    "You"
   end
 end
 
@@ -228,7 +108,7 @@ def empty_squares(brd)
 end
 
 def place_piece!(brd, plyr)
-  if plyr == "The Human"
+  if plyr == "You"
     player_turn!(brd)
   else
     computer_turn!(brd)
@@ -245,6 +125,79 @@ def player_turn!(brd)
   end
 
   brd[square] = PLAYER_MARKER
+end
+
+def score_the_game(brd)
+  outcome = detect_winner(brd)
+
+  if outcome == "The Computer"
+    10
+  elsif outcome == "You"
+    -10
+  elsif board_full?(brd)
+    0
+  end
+end
+
+def score_selector(player, scores)
+  player == "The Computer" ? scores.min : scores.max
+end
+
+def generate_move_scorecard(brd)
+  possible_move_hash = {}
+  empty_squares(brd).each { |move| possible_move_hash[move] = nil }
+  possible_move_hash
+end
+
+def temp_piece(player)
+  player == "You" ? PLAYER_MARKER : COMP_MARKER
+end
+
+def alternate_player(player)
+  player == "You" ? "The Computer" : "You"
+end
+
+def minimax(brd, move, player)
+  temp_board = brd.dup
+  scores = []
+
+  temp_board[move] = temp_piece(player)
+
+  score = score_the_game(temp_board)
+
+  if !!score
+    scores << score
+  else
+    available_moves = empty_squares(temp_board)
+
+    available_moves.each do |next_move|
+      scores << minimax(temp_board, next_move, alternate_player(player))
+    end
+
+  end
+
+  score_selector(player, scores)
+end
+
+def find_minimax_square(brd)
+  move_scores = generate_move_scorecard(brd)
+  available_moves = move_scores.keys
+
+  available_moves.each do |move|
+    move_scores[move] = minimax(brd, move, "The Computer")
+  end
+
+  move_scores.key(move_scores.values.max)
+end
+
+def computer_turn!(brd)
+  square = if !!find_best_square(brd)
+             find_best_square(brd)
+           else
+             find_minimax_square(brd)
+           end
+
+  brd[square] = COMP_MARKER
 end
 
 def win_the_game(brd)
@@ -296,7 +249,7 @@ end
 def detect_winner(brd)
   WINNING_LINES.each do |line|
     if brd.values_at(*line).count(PLAYER_MARKER) == 3
-      return "The Human"
+      return "You"
     elsif brd.values_at(*line).count(COMP_MARKER) == 3
       return "The Computer"
     end
@@ -314,12 +267,19 @@ def keep_score(hsh, brd)
   hsh[detect_winner(brd)] += 1 if someone_won?(brd)
 end
 
-def detect_match_winner(hsh, num)
-  if hsh["The Human"] == num
-    "The Human wins the match #{hsh['The Human']} - #{hsh['The Computer']} !!"
-  elsif hsh["The Computer"] == num
-    "The Computer wins the match #{hsh['The Computer']} - #{hsh['The Human']} !!"
+def display_match_winner(hsh, player)
+  case player
+  when "You"
+    "You win the match #{hsh['You']} - #{hsh['The Computer']}!!"
+  when "The Computer"
+    "The Computer wins the match #{hsh['The Computer']} - #{hsh['You']}!!"
+  else
+    "Match tied #{hsh['You']} - #{hsh['The Computer']}."
   end
+end
+
+def detect_match_winner(hsh)
+  hsh.key(hsh.values.max)
 end
 
 def play_again?
@@ -336,7 +296,8 @@ end
 
 loop do # MATCH LOOP
   games = retrieve_match_length
-  scoreboard = { "The Human" => 0, "The Computer" => 0 }
+  game_count = 0
+  scoreboard = { "You" => 0, "The Computer" => 0 }
 
   if FIRST_PLAYER == "choose"
     game_lead = retrieve_first_player
@@ -353,7 +314,6 @@ loop do # MATCH LOOP
       place_piece!(board, current_player)
       current_player = alternate_player(current_player)
       break if someone_won?(board) || board_full?(board)
-
     end
 
     display_board(board, scoreboard)
@@ -365,7 +325,8 @@ loop do # MATCH LOOP
     end
 
     keep_score(scoreboard, board)
-    break if scoreboard.value?(games)
+    game_count += 1
+    break if game_count == games
 
     pause_between_game
 
@@ -376,7 +337,9 @@ loop do # MATCH LOOP
                      end
   end
 
-  prompt detect_match_winner(scoreboard, games)
+  winner = detect_match_winner(scoreboard)
+
+  prompt display_match_winner(scoreboard, winner)
 
   break unless play_again?
 end

@@ -1,0 +1,49 @@
+
+#computer_turn
+  INPUT current board and computer's turn
+  CREATE a hash of available moves => nil (#generate_move_scorecard)
+  FOR EACH move in available moves, 
+    generate a score using #minimax
+
+      #minimax
+        INPUT current board, current move in question, and current player
+        CREATE duplicate board hash to manipulate
+        CREATE a list to hold the outcome scores for this branch
+        UPDATE duplicate board[current move] = player's marker
+        EVALUATE updated duplicate board using #score_the_game
+
+          #score_the_game
+            EVALUATE board for a winner
+              IF winner == computer
+                return 10
+              ELSIF winner == human
+                return 0
+              ELSIF nil
+                EVALUATE board full?
+                  IF board is full
+                    return 0
+                  ELSE nil
+              ELSE 
+                return nil
+
+        IF there is an outcome, 
+          append outcome to list of scores
+        IF #score_the_game == nil
+          alternate player
+          create a list of remaining available moves
+          FOR EACH move in available moves
+            recursively run #minimax(updated duplicate board, move, alternated player)
+
+        ONCE all available moves return an outcome
+          EVALUATE scores list using #score_selector
+            
+            #score_selector
+              IF player == human
+                return max value from scores list (equivalent to level (player = comp) above asking for max)
+              IF player == computer
+                return min value from scores list (equivalent to level (player = human) above asking for min)
+
+        RETURN value to #computer_turn
+
+  SELECT key with best possible score
+  UPDATE current board with COMP_MARKER at said key
