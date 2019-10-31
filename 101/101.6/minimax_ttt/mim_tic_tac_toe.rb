@@ -358,6 +358,8 @@ loop do # MATCH LOOP
   prompt display_match_outcome(scoreboard, winner)
 
   break unless play_again?
+
+  clear_screen
 end
 
 prompt "Thanks for playing! Go Bucks!!!"
