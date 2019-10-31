@@ -15,14 +15,25 @@ def clear_screen
   Gem.win_platform? ? (system "cls") : (system "clear")
 end
 
+def welcome
+  prompt "*** Welcome to the Unbeatable Tic-Tac-Toe! ***"
+  prompt "The scoreboard is only there to make you think you have a chance..."
+  puts "\n"
+end
+
 def retrieve_match_length
   answer = nil
 
   loop do
     prompt "How many games do you want to play?"
     answer = gets.chomp.strip
-    break if answer =~ /^[0-9]+$/
-    prompt "Invalid choice."
+    break if answer =~ /^[0-9]+$/ || answer == 0
+
+    if answer == 0
+      prompt "You have to play at least one game!"
+    else
+      prompt "Invalid choice."
+    end
   end
 
   answer.to_i
@@ -30,23 +41,24 @@ end
 
 # rubocop:disable Metrics/MethodLength
 # rubocop:disable Metrics/AbcSize
-def display_board(hsh1, hsh2)
+def display_board(game_board, scoreboard)
   clear_screen
   puts "---Current Game Score---"
-  puts "You: #{hsh2['You']} ||| The Computer: #{hsh2['The Computer']}"
+  puts "You: #{scoreboard['You']} ||| "\
+    "The Computer: #{scoreboard['The Computer']}"
   puts ""
-  puts "You is X. Computer is O."
+  puts "You are X. The Computer is O."
   puts ""
   puts "     |     |"
-  puts "  #{hsh1[1]}  |  #{hsh1[2]}  |  #{hsh1[3]}"
+  puts "  #{game_board[1]}  |  #{game_board[2]}  |  #{game_board[3]}"
   puts "     |     |"
   puts "-----+-----+-----"
   puts "     |     |"
-  puts "  #{hsh1[4]}  |  #{hsh1[5]}  |  #{hsh1[6]}"
+  puts "  #{game_board[4]}  |  #{game_board[5]}  |  #{game_board[6]}"
   puts "     |     |"
   puts "-----+-----+-----"
   puts "     |     |"
-  puts "  #{hsh1[7]}  |  #{hsh1[8]}  |  #{hsh1[9]}"
+  puts "  #{game_board[7]}  |  #{game_board[8]}  |  #{game_board[9]}"
   puts "     |     |"
   puts ""
 end
@@ -101,6 +113,21 @@ def starting_player(answer)
   else
     "You"
   end
+end
+
+def determine_player
+  if FIRST_PLAYER == "choose"
+    game_lead = retrieve_first_player
+    current_player = starting_player(game_lead)
+  else
+    current_player = FIRST_PLAYER
+  end
+
+  return game_lead, current_player
+end
+
+def next_game_first_player(game_lead, brd)
+  FIRST_PLAYER == "choose" ? first_player(game_lead, brd) : FIRST_PLAYER
 end
 
 def empty_squares(brd)
@@ -191,51 +218,35 @@ def find_minimax_square(brd)
 end
 
 def computer_turn!(brd)
-  square = if !!find_best_square(brd)
-             find_best_square(brd)
-           else
-             find_minimax_square(brd)
-           end
+  square = find_best_square(brd) || find_minimax_square(brd)
 
   brd[square] = COMP_MARKER
 end
 
-def win_the_game(brd)
+def win_or_block(brd, marker)
   square = nil
   WINNING_LINES.each do |line|
-    if  brd.values_at(*line).count(COMP_MARKER) == 2 &&
+    if  brd.values_at(*line).count(marker) == 2 &&
         brd.values_at(*line).count(INITIAL_MARKER) == 1
-      square = best_move(line, brd)
+      square = make_apprpriate_move(line, brd)
     end
   end
 
   square
 end
 
-def avoid_losing(brd)
-  square = nil
-  WINNING_LINES.each do |line|
-    if  brd.values_at(*line).count(PLAYER_MARKER) == 2 &&
-        brd.values_at(*line).count(INITIAL_MARKER) == 1
-      square = best_move(line, brd)
-    end
-  end
-
-  square
-end
-
-def best_move(line, brd)
+def make_apprpriate_move(line, brd)
   line.select { |num| brd[num] == INITIAL_MARKER }[0]
 end
 
+def piece_in_center_square(brd)
+  CENTER_SQUARE if empty_squares(brd).include?(CENTER_SQUARE)
+end
+
 def find_best_square(brd)
-  if !!win_the_game(brd)
-    win_the_game(brd)
-  elsif !!avoid_losing(brd)
-    avoid_losing(brd)
-  elsif empty_squares(brd).include?(CENTER_SQUARE)
-    CENTER_SQUARE
-  end
+  win_or_block(brd, COMP_MARKER) ||
+    win_or_block(brd, PLAYER_MARKER) ||
+    piece_in_center_square(brd)
 end
 
 def board_full?(brd)
@@ -257,29 +268,42 @@ def detect_winner(brd)
   nil
 end
 
+def display_game_outcome(brd)
+  if someone_won?(brd)
+    prompt "#{detect_winner(brd)} won!"
+  else
+    prompt "It's a tie"
+  end
+end
+
 def pause_between_game
   prompt "Press ENTER/RETURN to continue..."
   answer = gets
   answer
 end
 
-def keep_score(hsh, brd)
-  hsh[detect_winner(brd)] += 1 if someone_won?(brd)
+def keep_score(scoreboard, brd)
+  scoreboard[detect_winner(brd)] += 1 if someone_won?(brd)
 end
 
-def display_match_winner(hsh, player)
+def display_match_outcome(scoreboard, player)
   case player
   when "You"
-    "You win the match #{hsh['You']} - #{hsh['The Computer']}!!"
+    "You win the match #{scoreboard['You']} - #{scoreboard['The Computer']}!!"
   when "The Computer"
-    "The Computer wins the match #{hsh['The Computer']} - #{hsh['You']}!!"
+    "The Computer wins the match #{scoreboard['The Computer']} "\
+    "- #{scoreboard['You']}!!"
   else
-    "Match tied #{hsh['You']} - #{hsh['The Computer']}."
+    "Match tied #{scoreboard['You']} - #{scoreboard['The Computer']}."
   end
 end
 
-def detect_match_winner(hsh)
-  hsh.key(hsh.values.max)
+def detect_match_winner(scoreboard)
+  if scoreboard["You"] > scoreboard["The Computer"]
+    "You"
+  elsif scoreboard["You"] < scoreboard["The Computer"]
+    "The Computer"
+  end
 end
 
 def play_again?
@@ -294,17 +318,17 @@ def play_again?
   return true if %w(yes yeah yup sure yah y).include?(answer)
 end
 
+# -------- PROGRAM START --------
+
+clear_screen
+welcome
+
 loop do # MATCH LOOP
   games = retrieve_match_length
   game_count = 0
   scoreboard = { "You" => 0, "The Computer" => 0 }
 
-  if FIRST_PLAYER == "choose"
-    game_lead = retrieve_first_player
-    current_player = starting_player(game_lead)
-  else
-    current_player = FIRST_PLAYER
-  end
+  game_lead, current_player = determine_player
 
   loop do # GAME LOOP
     board = initialize_board
@@ -318,11 +342,7 @@ loop do # MATCH LOOP
 
     display_board(board, scoreboard)
 
-    if someone_won?(board)
-      prompt "#{detect_winner(board)} won!"
-    else
-      prompt "It's a tie"
-    end
+    display_game_outcome(board)
 
     keep_score(scoreboard, board)
     game_count += 1
@@ -330,16 +350,12 @@ loop do # MATCH LOOP
 
     pause_between_game
 
-    current_player = if FIRST_PLAYER == "choose"
-                       first_player(game_lead, board)
-                     else
-                       FIRST_PLAYER
-                     end
+    current_player = next_game_first_player(game_lead, board)
   end
 
   winner = detect_match_winner(scoreboard)
 
-  prompt display_match_winner(scoreboard, winner)
+  prompt display_match_outcome(scoreboard, winner)
 
   break unless play_again?
 end
