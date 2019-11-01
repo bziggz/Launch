@@ -38,9 +38,9 @@ def retrieve_match_length
   loop do
     prompt "How many games do you want to play?"
     answer = gets.chomp.strip
-    break if answer =~ /^[0-9]+$/ || answer == 0
+    break if answer =~ /^[0-9]+$/ && answer != "0"
 
-    if answer == 0
+    if answer == "0"
       prompt "You have to play at least one game!"
     else
       prompt "Invalid choice."
