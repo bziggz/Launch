@@ -151,16 +151,6 @@ def busted?(total)
   total > TARGET_NUMBER
 end
 
-def compare_cards(player_total, dealer_total)
-  if player_total > dealer_total
-    "You win!!!"
-  elsif player_total < dealer_total
-    "The Dealer wins."
-  else
-    "It's a Push."
-  end
-end
-
 def dealer_turn(deck, dealer_hand)
   loop do
     dealer_total = total_cards(dealer_hand)
@@ -175,30 +165,46 @@ def display_totals(player_total, dealer_total)
   "Your Total: #{player_total} ||| The Dealer's Total: #{dealer_total}"
 end
 
-def display_outcome(player_total, player_hand, dealer_total, dealer_hand)
+def compare_cards(player_total, dealer_total)
+  if player_total > dealer_total
+    :player_win
+  elsif player_total < dealer_total
+    :dealer_win
+  else
+    :push
+  end
+end
+
+def game_outcome(player_total, player_hand, dealer_total, dealer_hand)
   if blackjack?(player_total, player_hand)
-    "Blackjack!!!"
+    :player_blackjack
   elsif busted?(player_total)
-    "You Bust!!!"
+    :player_bust
   elsif blackjack?(dealer_total, dealer_hand)
-    "The Dealer has Blackjack. The Dealer Wins."
+    :dealer_blackjack
   elsif busted?(dealer_total)
-    "The Dealer Busts! You win!!!"
+    :dealer_bust
   else
     compare_cards(player_total, dealer_total)
   end
 end
 
+def display_outcome(outcome)
+  case outcome
+  when :player_blackjack then "Blackjack!!!"
+  when :player_bust then "You Bust!!!"
+  when :dealer_blackjack then "The Dealer has Blackjack. The Dealer Wins."
+  when :dealer_bust then "The Dealer Busts! You win!!!"
+  when :player_win then "You win!!!"
+  when :dealer_win then "The Dealer wins."
+  when :push then "Push."
+  end
+end
+
 def determine_game_winner(outcome)
   case outcome
-  when  "You win!!!",
-        "The Dealer Busts! You win!!!",
-        "Blackjack!!!"
-    "You"
-  when  "You Bust!!!",
-        "The Dealer wins.",
-        "The Dealer has Blackjack. The Dealer Wins."
-    "The Dealer"
+  when :player_blackjack, :dealer_bust, :player_win then "You"
+  when :player_bust, :dealer_blackjack, :dealer_win then "The Dealer"
   end
 end
 
@@ -273,9 +279,10 @@ loop do # MAIN LOOP
     display_table(player_hand, dealer_hand, false)
 
     prompt display_totals(player_total, dealer_total)
-    prompt outcome = display_outcome(player_total, player_hand, dealer_total)
+    result = game_outcome(player_total, player_hand, dealer_total, dealer_hand)
+    prompt display_outcome(result)
 
-    keep_score(scoreboard, determine_game_winner(outcome))
+    keep_score(scoreboard, determine_game_winner(result))
 
     game_count += 1
 
