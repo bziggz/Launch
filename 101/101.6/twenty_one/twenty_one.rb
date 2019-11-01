@@ -1,3 +1,4 @@
+SUITS = ["\xE2\x99\xA0", "\xE2\x99\xA3", "\xE2\x99\xA5", "\xE2\x99\xA6"]
 DECK = {
   "2" => 2, "3" => 3, "4" => 4, "5" => 5, "6" => 6, "7" => 7, "8" => 8,
   "9" => 9, "10" => 10, "J" => 10, "Q" => 10, "K" => 10, "A" => 11
@@ -5,13 +6,13 @@ DECK = {
 
 TARGET_NUMBER = 21
 DEALER_STAY = TARGET_NUMBER - 4
-BEST_SCORE =  if TARGET_NUMBER <= 11
-                1
-              elsif TARGET_NUMBER <= 44
-                TARGET_NUMBER / 11 + 1
-              elsif TARGET_NUMBER <= 204
-                (TARGET_NUMBER - 35) / 10
-              end
+BLACKJACK = if TARGET_NUMBER <= 11
+              1
+            elsif TARGET_NUMBER <= 44
+              TARGET_NUMBER / 11 + 1
+            elsif TARGET_NUMBER <= 204
+              (TARGET_NUMBER - 35) / 10
+            end
 
 def prompt(str)
   puts "=> #{str}"
@@ -55,7 +56,7 @@ def display_scoreboard(board)
 end
 
 def initialize_game_deck
-  DECK.keys * 4
+  DECK.keys.product(SUITS)
 end
 
 def deal_card(deck, hand)
@@ -71,26 +72,48 @@ def deal_opening_hand(deck, player_hand, dealer_hand)
   end
 end
 
-def display_hand(hand, hidden = "No")
+def display_card(card)
+  "[#{card[0]}#{card[1]}]"
+end
+
+def display_hand(hand, hidden = false)
   output = ""
 
-  if hidden == "Yes"
-    output << hand[0] + " ?"
+  if hidden
+    output << display_card(hand[0]) + " [XX]"
   else
-    hand.each { |card| output << card + " " }
+    hand.each { |card| output << display_card(card) + " " }
   end
 
   output
 end
 
-def display_table(player_hand, dealer_hand, hidden = "Yes")
+def display_table(player_hand, dealer_hand, hidden = true)
   prompt "The Dealer's Cards: #{display_hand(dealer_hand, hidden)}"
-  prompt "Your Cards: #{display_hand(player_hand)}"
+  prompt "Your Cards: #{display_hand(player_hand, false)}"
   puts "\n"
 end
 
+def player_turn(player_hand, dealer_hand, deck, scoreboard)
+  player_total = 0
+
+  loop do
+    display_table(player_hand, dealer_hand)
+    player_total = total_cards(player_hand)
+
+    break if  blackjack?(player_total, player_hand) ||
+              busted?(player_total) ||
+              player_stays?(player_hand, dealer_hand)
+
+    deal_card(deck, player_hand)
+    game_clear(scoreboard)
+  end
+
+  player_total
+end
+
 def total_cards(hand)
-  value_list = hand.map { |card| DECK[card] }
+  value_list = hand.map { |card| DECK[card[0]] }
 
   value_list.map! do |value|
     value == 11 && value_list.sum > TARGET_NUMBER ? 1 : value
@@ -116,6 +139,28 @@ def hit_or_stay(player_hand, dealer_hand)
   answer
 end
 
+def player_stays?(player_hand, dealer_hand)
+  hit_or_stay(player_hand, dealer_hand) == 2
+end
+
+def blackjack?(player_total, player_hand)
+  player_total == TARGET_NUMBER && player_hand.size == BLACKJACK
+end
+
+def busted?(total)
+  total > TARGET_NUMBER
+end
+
+def compare_cards(player_total, dealer_total)
+  if player_total > dealer_total
+    "You win!!!"
+  elsif player_total < dealer_total
+    "The Dealer wins."
+  else
+    "It's a Push."
+  end
+end
+
 def dealer_turn(deck, dealer_hand)
   loop do
     dealer_total = total_cards(dealer_hand)
@@ -130,30 +175,29 @@ def display_totals(player_total, dealer_total)
   "Your Total: #{player_total} ||| The Dealer's Total: #{dealer_total}"
 end
 
-# rubocop:disable Metrics/CyclomaticComplexity
-# rubocop:disable Metrics/PerceivedComplexity
-def display_outcome(player_total, player_hand, dealer_total)
-  if player_total > TARGET_NUMBER
+def display_outcome(player_total, player_hand, dealer_total, dealer_hand)
+  if blackjack?(player_total, player_hand)
+    "Blackjack!!!"
+  elsif busted?(player_total)
     "You Bust!!!"
-  elsif dealer_total > TARGET_NUMBER
+  elsif blackjack?(dealer_total, dealer_hand)
+    "The Dealer has Blackjack. The Dealer Wins."
+  elsif busted?(dealer_total)
     "The Dealer Busts! You win!!!"
-  elsif (player_total == TARGET_NUMBER && player_hand.size == BEST_SCORE) ||
-        player_total > dealer_total
-    "You win!!!"
-  elsif player_total < dealer_total
-    "The Dealer wins."
   else
-    "It's a Push."
+    compare_cards(player_total, dealer_total)
   end
 end
-# rubocop:enable Metrics/CyclomaticComplexity
-# rubocop:enable Metrics/PerceivedComplexity
 
-def who_won_the_game(outcome)
+def determine_game_winner(outcome)
   case outcome
-  when "You win!!!", "The Dealer Busts! You win!!!"
+  when  "You win!!!",
+        "The Dealer Busts! You win!!!",
+        "Blackjack!!!"
     "You"
-  when "You Bust!!!", "The Dealer wins."
+  when  "You Bust!!!",
+        "The Dealer wins.",
+        "The Dealer has Blackjack. The Dealer Wins."
     "The Dealer"
   end
 end
@@ -188,7 +232,7 @@ def display_match_outcome(score, winner)
 end
 
 def play_again?
-  answer = ''
+  answer = 1
   loop do
     prompt %(Play again?
     1 - Yes
@@ -217,33 +261,21 @@ loop do # MAIN LOOP
     game_deck = initialize_game_deck
     dealer_hand = []
     player_hand = []
-    player_total = 0
 
     deal_opening_hand(game_deck, player_hand, dealer_hand)
 
-    loop do # PLAYER'S TURN
-      display_table(player_hand, dealer_hand)
-
-      player_total = total_cards(player_hand)
-
-      break if  player_total >= TARGET_NUMBER ||
-                hit_or_stay(player_hand, dealer_hand) == 2
-
-      deal_card(game_deck, player_hand)
-
-      game_clear(scoreboard)
-    end
+    player_total = player_turn(player_hand, dealer_hand, game_deck, scoreboard)
 
     dealer_turn(game_deck, dealer_hand) unless player_total > TARGET_NUMBER
 
     dealer_total = total_cards(dealer_hand)
 
-    display_table(player_hand, dealer_hand, "No")
+    display_table(player_hand, dealer_hand, false)
 
     prompt display_totals(player_total, dealer_total)
     prompt outcome = display_outcome(player_total, player_hand, dealer_total)
 
-    keep_score(scoreboard, who_won_the_game(outcome))
+    keep_score(scoreboard, determine_game_winner(outcome))
 
     game_count += 1
 
