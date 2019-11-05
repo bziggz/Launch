@@ -27,9 +27,9 @@ def retrieve_match_length
   loop do
     prompt "How many games do you want to play?"
     answer = gets.chomp.strip
-    break if answer =~ /^[0-9]+$/ || answer == 0
+    break if answer =~ /^[0-9]+$/ && answer != "0"
 
-    if answer == 0
+    if answer == "0"
       prompt "You have to play at least one game!"
     else
       prompt "Invalid choice."
@@ -318,6 +318,15 @@ def play_again?
   return true if %w(yes yeah yup sure yah y).include?(answer)
 end
 
+def play_round(board, scoreboard, current_player)
+  loop do
+    display_board(board, scoreboard)
+    place_piece!(board, current_player)
+    current_player = alternate_player(current_player)
+    break if someone_won?(board) || board_full?(board)
+  end
+end
+
 # -------- PROGRAM START --------
 
 clear_screen
@@ -333,12 +342,7 @@ loop do # MATCH LOOP
   loop do # GAME LOOP
     board = initialize_board
 
-    loop do
-      display_board(board, scoreboard)
-      place_piece!(board, current_player)
-      current_player = alternate_player(current_player)
-      break if someone_won?(board) || board_full?(board)
-    end
+    play_round(board, scoreboard, current_player)
 
     display_board(board, scoreboard)
 
