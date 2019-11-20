@@ -38,13 +38,17 @@ def non_recursive_merge_sort(arr)
 
   temp_arr = [arr[0...(arr.size / 2)], arr[(arr.size / 2)..-1]]
 
-  5.times do 
-    temp_arr.map do |inner_arr|
-      if inner_arr.size > 1
-        inner_arr = [inner_arr[0...(inner_arr.size / 2)], inner_arr[(inner_arr.size / 2)..-1]]
-      else
-        inner_arr
+  temp_arr.map do |inner_arr|
+    if inner_arr.size > 1
+      inner_arr.map do |innerer_arr|
+        if innerer_arr.size > 1
+          innerer_arr = [innerer_arr[0...(innerer_arr.size / 2)], innerer_arr[(innerer_arr.size / 2)..-1]]
+        else
+          innerer_arr
+        end
       end
+    else
+      inner_arr
     end
   end
 
