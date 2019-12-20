@@ -1,6 +1,3 @@
-require 'pry'
-require 'pry-byebug'
-
 module Evaluate
   attr_reader :action
 
