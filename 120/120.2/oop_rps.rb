@@ -1,4 +1,4 @@
-module Evaluate
+module Evaluator
   attr_reader :action
 
   def scissors?
@@ -19,6 +19,273 @@ module Evaluate
 
   def spock?
     self.class == Spock
+  end
+end
+
+class Rock
+  include Evaluator
+
+  def >(other_move)
+    @action = 'crushes' if other_move.lizard? || other_move.scissors?
+  end
+
+  def to_s
+    "Rock"
+  end
+end
+
+class Paper
+  include Evaluator
+
+  def >(other_move)
+    @action = if other_move.rock?
+                'covers'
+              elsif other_move.spock?
+                'disproves'
+              end
+  end
+
+  def to_s
+    "Paper"
+  end
+end
+
+class Scissors
+  include Evaluator
+
+  def >(other_move)
+    @action = if other_move.paper?
+                'cuts'
+              elsif other_move.lizard?
+                'decapitates'
+              end
+  end
+
+  def to_s
+    "Scissors"
+  end
+end
+
+class Lizard
+  include Evaluator
+
+  def >(other_move)
+    @action = if other_move.spock?
+                'poisons'
+              elsif other_move.paper?
+                'eats'
+              end
+  end
+
+  def to_s
+    "Lizard"
+  end
+end
+
+class Spock
+  include Evaluator
+
+  def >(other_move)
+    @action = if other_move.rock?
+                'vaporizes'
+              elsif other_move.scissors?
+                'smashes'
+              end
+  end
+
+  def to_s
+    "Spock"
+  end
+end
+
+class Move
+  CHOICES = {
+    'r' => Rock,
+    'p' => Paper,
+    'c' => Scissors,
+    'l' => Lizard,
+    's' => Spock
+  }
+
+  attr_reader :value
+
+  def initialize(choice)
+    @value = CHOICES[choice].new
+  end
+end
+
+class Personality
+  attr_reader :name, :lose, :win
+
+  def choose(_)
+    tendancy.sample
+  end
+
+  def to_s
+    name
+  end
+end
+
+# Robot Devil give you the illusion of a fair game, see computer.choose
+class RobotDevil < Personality
+  include Evaluator
+  WINNING_MOVES = {
+    Rock => ['p', 's'],
+    Paper => ['c', 'l'],
+    Scissors => ['s', 'r'],
+    Lizard => ['r', 'c'],
+    Spock  => ['l', 'p']
+  }
+
+  def initialize
+    @name = "Robot Devil"
+  end
+
+  def choose(other)
+    WINNING_MOVES.each_pair do |type, choices|
+      return choices.sample if other.class == type
+    end
+  end
+
+  def lose
+    ""
+  end
+
+  def win
+    "\nAh, my ridiculously circuitous plan is one-quarter complete..."
+  end
+
+  def to_s
+    name
+  end
+end
+
+# Roberto likes to stab so extra scissors
+class Roberto < Personality
+  def initialize
+    @name = "Roberto"
+  end
+
+  def tendancy
+    %w(c c c c r l s p)
+  end
+
+  def lose
+    "\nI need to stab someone! Where's my stabbing knife?!"
+  end
+
+  def win
+    "\nWell, well, looks like old Roberto's the focus of attention now. "\
+    "STOP LOOKING AT ME! Ha ha ha ha ha HAAAA!!!"
+  end
+
+  def to_s
+    name
+  end
+end
+
+# Bender won't do two things, can bend paper the easiest (laziest)
+class Bender < Personality
+  def initialize
+    @name = "Bender"
+  end
+
+  def tendancy
+    %w(p)
+  end
+
+  def lose
+    "\nI’m so embarrassed, I wish everybody else was dead."
+  end
+
+  def win
+    "\nYou know what cheers me up? Other people’s misfortune."
+  end
+
+  def to_s
+    name
+  end
+end
+
+# Calculon overacts so extra spock, and won't use a script so no paper
+class Calculon < Personality
+  def initialize
+    @name = "Calculon"
+  end
+
+  def tendancy
+    %w(s s s s r l c)
+  end
+
+  def lose
+    "\nOh, how cruel and melodramatic fate is. WHYYYYY???"
+  end
+
+  def win
+    "\nI'd like to thank the Academy, "\
+    "my agent and most of all, my operating system."
+  end
+
+  def to_s
+    name
+  end
+end
+
+# Robot Santa thinks every choice is equally as naughty
+class RobotSanta < Personality
+  def initialize
+    @name = "Robot Santa"
+  end
+
+  def tendancy
+    %w(r p c l s)
+  end
+
+  def lose
+    "\nI'll be back. Back when you least expect it: Next Xmas!"
+  end
+
+  def win
+    "\nHo Ho Ho! It's time to get jolly on your naughty asses!"
+  end
+
+  def to_s
+    name
+  end
+end
+
+# Tinny Tim was created to lose.
+class TinnyTim < Personality
+  include Evaluator
+  attr_reader :name
+  LOSING_MOVES = {
+    Rock => ['l', 'c'],
+    Paper => ['r', 's'],
+    Scissors => ['l', 'p'],
+    Lizard => ['s', 'p'],
+    Spock  => ['r', 'c']
+  }
+
+  def initialize
+    @name = "Tinny Tim"
+  end
+
+  def choose(other)
+    LOSING_MOVES.each_pair do |type, choices|
+      return choices.sample if other.class == type
+    end
+  end
+
+  def lose
+    "\nYou raised my hopes and dashed them quite expertly, sir. Bravo!"
+  end
+
+  def win
+    ""
+  end
+
+  def to_s
+    name
   end
 end
 
@@ -73,136 +340,31 @@ class Human < Player
 end
 
 class Computer < Player
-  include Evaluate
-  PERSONALITIES = {
-    'Roberto' => %w(c c c c r l s p),
-    # Roberto likes to stab so extra scissors
-    'Robot Santa' => %w(r p c l s),
-    # Robot Santa thinks every choice is equally as naughty
-    'Bender' => %w(p),
-    # Bender won't do two things, can bend paper the easiest (laziest)
-    'Calculon' => %w(s s s s r l c),
-    # Calculon overacts so extra spock, and won't use a script so no paper
-    'Robot Devil' => nil
-    # Robot Devil give you the illusion of a fair game, see computer.choose
-  }
+  PERSONALITIES = [
+    Roberto,
+    RobotSanta,
+    Bender,
+    Calculon,
+    RobotDevil,
+    TinnyTim
+  ]
+  attr_accessor :lose, :win
+  attr_reader :personality
+
+  def set_personality
+    @personality = PERSONALITIES.sample.new
+  end
 
   def set_name
-    self.name = PERSONALITIES.keys.sample
+    set_personality
+    self.name = personality.name
+    self.lose = personality.lose
+    self.win = personality.win
   end
 
   def choose(other)
-    choice =  if name == 'Robot Devil'
-                deal_with_the_devil_with_you(other)
-              else
-                PERSONALITIES[name].sample
-              end
-
-    self.move = Move.new(choice).value
+    self.move = Move.new(personality.choose(other)).value
     update_history
-  end
-
-  private
-
-  def deal_with_the_devil_with_you(other)
-    case
-    when other.rock?      then ['p', 's'].sample
-    when other.paper?     then ['c', 'l'].sample
-    when other.scissors?  then ['s', 'r'].sample
-    when other.lizard?    then ['r', 'c'].sample
-    when other.spock?     then ['l', 'p'].sample
-    end
-  end
-end
-
-class Move
-  CHOICES = %w(r p c l s)
-  attr_reader :value
-
-  def initialize(choice)
-    @value =  case choice
-              when 'r' then Rock.new
-              when 'p' then Paper.new
-              when 'c' then Scissors.new
-              when 'l' then Lizard.new
-              when 's' then Spock.new
-              end
-  end
-end
-
-class Rock
-  include Evaluate
-
-  def >(other_move)
-    @action = 'crushes' if other_move.lizard? || other_move.scissors?
-  end
-
-  def to_s
-    "Rock"
-  end
-end
-
-class Paper
-  include Evaluate
-
-  def >(other_move)
-    @action = if other_move.rock?
-                'covers'
-              elsif other_move.spock?
-                'disproves'
-              end
-  end
-
-  def to_s
-    "Paper"
-  end
-end
-
-class Scissors
-  include Evaluate
-
-  def >(other_move)
-    @action = if other_move.paper?
-                'cuts'
-              elsif other_move.lizard?
-                'decapitates'
-              end
-  end
-
-  def to_s
-    "Scissors"
-  end
-end
-
-class Lizard
-  include Evaluate
-
-  def >(other_move)
-    @action = if other_move.spock?
-                'poisons'
-              elsif other_move.paper?
-                'eats'
-              end
-  end
-
-  def to_s
-    "Lizard"
-  end
-end
-
-class Spock
-  include Evaluate
-
-  def >(other_move)
-    @action = if other_move.rock?
-                'vaporizes'
-              elsif other_move.scissors?
-                'smashes'
-              end
-  end
-
-  def to_s
-    "Spock"
   end
 end
 
@@ -249,10 +411,15 @@ class RPSMatch
   end
 
   def display_match_winner
-    if human.score > computer.score
-      puts "#{human.name} wins #{human.score}-#{computer.score} !!!"
+    human_score = human.score
+    computer_score = computer.score
+
+    if human_score > computer_score
+      puts "#{human.name} wins #{human_score}-#{computer_score} !!!"\
+      "#{computer.lose}"
     else
-      puts "#{computer.name} wins #{computer.score}-#{human.score} !!!"
+      puts "#{computer.name} wins #{computer_score}-#{human_score} !!!"\
+      "#{computer.win}"
     end
   end
 
@@ -302,18 +469,19 @@ class RPSMatch
     answer.downcase == 'y'
   end
 
+  def game_sequence(length)
+    loop do
+      clear_screen
+      display_score
+      Game.new(human, computer).play
+      continue_match
+      break if [human.score, computer.score].include?(length)
+    end
+  end
+
   def play
     loop do
-      length = set_match_length
-
-      loop do
-        clear_screen
-        display_score
-        Game.new(human, computer).play
-        continue_match
-        break if [human.score, computer.score].include?(length)
-      end
-
+      game_sequence(set_match_length)
       display_match_winner
       break unless play_again?
       reset_match_score
@@ -336,7 +504,7 @@ class Game < RPSMatch
     puts "#{human.name} chose #{human.move}. "\
     "#{computer.name} chose #{computer.move}."
 
-    if winner && winner.move.rock? && loser.move.scissors?
+    if winner&.move.rock? && loser.move.scissors?
       puts "As it always has, "\
       "#{winner.move} #{winner.move.action} #{loser.move}."
     elsif winner
@@ -369,7 +537,7 @@ class Game < RPSMatch
     display_moves
     puts display_winner
     RPSMatch.update_history(display_winner)
-    winner.update_score if winner
+    winner&.update_score
   end
 end
 
