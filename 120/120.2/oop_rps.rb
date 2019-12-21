@@ -154,10 +154,6 @@ class RobotDevil < Personality
   def win
     "\nAh, my ridiculously circuitous plan is one-quarter complete..."
   end
-
-  def to_s
-    name
-  end
 end
 
 # Roberto likes to stab so extra scissors
@@ -178,10 +174,6 @@ class Roberto < Personality
     "\nWell, well, looks like old Roberto's the focus of attention now. "\
     "STOP LOOKING AT ME! Ha ha ha ha ha HAAAA!!!"
   end
-
-  def to_s
-    name
-  end
 end
 
 # Bender won't do two things, can bend paper the easiest (laziest)
@@ -200,10 +192,6 @@ class Bender < Personality
 
   def win
     "\nYou know what cheers me up? Other people’s misfortune."
-  end
-
-  def to_s
-    name
   end
 end
 
@@ -225,10 +213,6 @@ class Calculon < Personality
     "\nI'd like to thank the Academy, "\
     "my agent and most of all, my operating system."
   end
-
-  def to_s
-    name
-  end
 end
 
 # Robot Santa thinks every choice is equally as naughty
@@ -247,10 +231,6 @@ class RobotSanta < Personality
 
   def win
     "\nHo Ho Ho! It's time to get jolly on your naughty asses!"
-  end
-
-  def to_s
-    name
   end
 end
 
@@ -282,10 +262,6 @@ class TinnyTim < Personality
 
   def win
     ""
-  end
-
-  def to_s
-    name
   end
 end
 
