@@ -348,7 +348,17 @@ class Computer < Player
     RobotDevil,
     TinnyTim
   ]
-  attr_accessor :lose, :win
+
+  attr_reader :lose, :win
+
+  def choose(other)
+    self.move = Move.new(personality.choose(other)).value
+    update_history
+  end
+
+  private
+
+  attr_writer :lose, :win
   attr_reader :personality
 
   def set_personality
@@ -361,15 +371,9 @@ class Computer < Player
     self.lose = personality.lose
     self.win = personality.win
   end
-
-  def choose(other)
-    self.move = Move.new(personality.choose(other)).value
-    update_history
-  end
 end
 
 class RPSMatch
-  attr_accessor :human, :computer, :winner, :score
   @@history = []
 
   def initialize
@@ -378,6 +382,26 @@ class RPSMatch
     @human = Human.new
     @computer = Computer.new
   end
+
+  def play
+    loop do
+      game_sequence(set_match_length)
+      display_match_winner
+      break unless play_again?
+      reset_match_score
+      clear_screen
+    end
+
+    display_goodbye_message
+  end
+
+  def self.update_history(winner)
+    @@history << winner
+  end
+
+  private
+
+  attr_accessor :human, :computer, :winner, :score
 
   def clear_screen
     Gem.win_platform? ? (system "cls") : (system "clear")
@@ -421,10 +445,6 @@ class RPSMatch
       puts "#{computer.name} wins #{computer_score}-#{human_score} !!!"\
       "#{computer.win}"
     end
-  end
-
-  def self.update_history(winner)
-    @@history << winner
   end
 
   def display_history
@@ -478,33 +498,33 @@ class RPSMatch
       break if [human.score, computer.score].include?(length)
     end
   end
-
-  def play
-    loop do
-      game_sequence(set_match_length)
-      display_match_winner
-      break unless play_again?
-      reset_match_score
-      clear_screen
-    end
-
-    display_goodbye_message
-  end
 end
 
 class Game < RPSMatch
-  attr_accessor :winner, :loser
-
   def initialize(human, computer)
     @human = human
     @computer = computer
   end
 
+  def play
+    human.choose
+    computer.choose(human.move)
+    determine_game_winner
+    display_moves
+    puts display_winner
+    RPSMatch.update_history(display_winner)
+    winner&.update_score
+  end
+
+  private
+
+  attr_accessor :winner, :loser
+
   def display_moves
     puts "#{human.name} chose #{human.move}. "\
     "#{computer.name} chose #{computer.move}."
 
-    if winner&.move.rock? && loser.move.scissors?
+    if winner && winner.move.rock? && loser.move.scissors?
       puts "As it always has, "\
       "#{winner.move} #{winner.move.action} #{loser.move}."
     elsif winner
@@ -528,16 +548,6 @@ class Game < RPSMatch
     when computer then  "#{computer.name} won!"
     else                "It's a tie."
     end
-  end
-
-  def play
-    human.choose
-    computer.choose(human.move)
-    determine_game_winner
-    display_moves
-    puts display_winner
-    RPSMatch.update_history(display_winner)
-    winner&.update_score
   end
 end
 
