@@ -1,6 +1,3 @@
-require 'pry'
-require 'pry-byebug'
-
 module Clearable
   def clear_screen
     Gem.win_platform? ? (system "cls") : (system "clear")
@@ -8,8 +5,7 @@ module Clearable
 end
 
 class Card
-  attr_reader :rank, :suit
-  attr_accessor :value
+  attr_reader :rank, :suit, :value
 
   def initialize(rank, suit)
     @rank = rank
@@ -33,6 +29,7 @@ class Deck
   }.freeze
 
   attr_reader = :deck
+
   def initialize
     @deck = RANKS.keys.product(SUITS)
   end
@@ -45,6 +42,15 @@ end
 class Shoe
   NUMBER_OF_DECKS = 8
 
+  def draw
+    reset if @shoe.empty?
+    card = @shoe.sample
+    @shoe.delete(card)
+    Card.new(card[0], card[1])
+  end
+
+  private
+
   def initialize
     reset
   end
@@ -52,19 +58,12 @@ class Shoe
   def reset
     @shoe = Deck.new * NUMBER_OF_DECKS
   end
-
-  def draw
-    reset if @shoe.empty?
-    card = @shoe.sample
-    @shoe.delete(card)
-    Card.new(card[0], card[1])
-  end
 end
 
 
 class Hand
   include Comparable
-  attr_accessor :hand, :ranks, :suits, :size, :values, :score
+  attr_accessor :hand, :score, :size
 
   def initialize
     @hand = []
@@ -78,12 +77,6 @@ class Hand
     @score = determine_score
   end
 
-
-  def format_for_display
-    @ranks = hand.map { |card| "#{card.rank.ljust(3)}"}
-    @suits = hand.map { |card| "#{card.suit.rjust(3)}"}
-  end
-
   def determine_score
     values = hand.map { |card| card.value }
 
@@ -92,10 +85,6 @@ class Hand
     end
 
     values.sum
-  end
-
-  def <=>(other)
-    self.score <=> other.score
   end
 
   def show_cards(face_up = true)
@@ -115,10 +104,25 @@ class Hand
 
     format_for_display
   end
+
+  protected
+
+  def <=>(other)
+    self.score <=> other.score
+  end
+
+  private
+
+  attr_accessor :ranks, :suits
+
+  def format_for_display
+    @ranks = hand.map { |card| "#{card.rank.ljust(3)}"}
+    @suits = hand.map { |card| "#{card.suit.rjust(3)}"}
+  end
 end
 
 class Player
-  attr_accessor :hand, :match_score, :name, :shoe
+  attr_accessor :hand, :match_score, :name
 
   def initialize
     set_name
@@ -173,7 +177,6 @@ class Human < Player
     end
     answer == 2
   end
-
 end
 
 class Dealer < Player
@@ -200,6 +203,8 @@ class Game
     keep_score
     reset_table
   end
+
+  private
 
   def initialize(shoe, human, dealer)
     @shoe = shoe
@@ -404,6 +409,7 @@ class Match
     clear_screen
     puts "Thanks for playing 21! Go Bucks!!!"
     puts "\n"
+    sleep(0.75)
   end
 
   def game_sequence(match_length)
