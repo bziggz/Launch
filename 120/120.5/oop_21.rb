@@ -2,6 +2,10 @@ module Clearable
   def clear_screen
     Gem.win_platform? ? (system "cls") : (system "clear")
   end
+
+  def clear_input(n, str)
+    "\e[#{n}A" + str + "\e[K"
+  end
 end
 
 class Card
@@ -16,10 +20,10 @@ end
 
 class Deck
   SUITS = [
-    "\xE2\x99\xA0",
-    "\xE2\x99\xA3",
-    "\xE2\x99\xA5",
-    "\xE2\x99\xA6"
+    "\xE2\x99\xA0", # spades
+    "\xE2\x99\xA3", # clubs
+    "\xE2\x99\xA5", # hearts
+    "\xE2\x99\xA6"  # diamonds
   ].freeze
 
   RANKS = {
@@ -28,7 +32,7 @@ class Deck
     "A " => 11
   }.freeze
 
-  attr_reader = :deck
+  attr_reader :deck
 
   def initialize
     @deck = RANKS.keys.product(SUITS)
@@ -60,7 +64,6 @@ class Shoe
   end
 end
 
-
 class Hand
   include Comparable
   attr_accessor :hand, :score, :size
@@ -78,7 +81,7 @@ class Hand
   end
 
   def determine_score
-    values = hand.map { |card| card.value }
+    values = hand.map(&:value)
 
     values.map! do |value|
       value == 11 && values.sum > Match::TARGET ? 1 : value
@@ -87,28 +90,32 @@ class Hand
     values.sum
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity
+  # rubocop:disable Metrics/AbcSize
   def show_cards(face_up = true)
-    if face_up == false && size >= 2 
-      @ranks[-1] = '   ' 
-      @suits[-1] = ' ? ' 
+    if face_up == false && size >= 2
+      @ranks[-1] = '   '
+      @suits[-1] = ' ? '
     end
 
     puts "\n"
     puts "  ___ " * size
-    print " |#{@ranks.shift}|" until @ranks == nil || @ranks.empty?
+    print " |#{@ranks.shift}|" until @ranks.nil? || @ranks.empty?
     puts ""
-    print " |#{@suits.shift}|" until @suits == nil || @suits.empty?
+    print " |#{@suits.shift}|" until @suits.nil? || @suits.empty?
     puts ""
     puts " |___|" * size
     puts "\n"
 
     format_for_display
   end
+  # rubocop:enable Metrics/CyclomaticComplexity
+  # rubocop:enable Metrics/AbcSize
 
   protected
 
   def <=>(other)
-    self.score <=> other.score
+    score <=> other.score
   end
 
   private
@@ -116,12 +123,13 @@ class Hand
   attr_accessor :ranks, :suits
 
   def format_for_display
-    @ranks = hand.map { |card| "#{card.rank.ljust(3)}"}
-    @suits = hand.map { |card| "#{card.suit.rjust(3)}"}
+    @ranks = hand.map { |card| card.rank.to_s.ljust(3) }
+    @suits = hand.map { |card| card.suit.to_s.rjust(3) }
   end
 end
 
 class Player
+  include Clearable
   attr_accessor :hand, :match_score, :name
 
   def initialize
@@ -130,7 +138,7 @@ class Player
     @match_score = 0
   end
 
-  def update_match_score 
+  def update_match_score
     self.match_score += 1
   end
 
@@ -158,7 +166,7 @@ class Human < Player
       puts "What's your name?"
       n = gets.chomp.strip
       break unless n.empty?
-      puts "Must enter something."
+      puts clear_input(2, "Must enter something.\n")
     end
 
     self.name = n
@@ -166,14 +174,13 @@ class Human < Player
 
   def hit_or_stay?
     answer = nil
-    loop do 
+    loop do
       puts %(Do you want to Hit or Stay?
       1 - Hit
       2 - Stay)
       answer = gets.chomp.to_i
       break if [1, 2].include?(answer)
-      display_table
-      puts "Invalid Choice"
+      print clear_input(4, "Invalid Choice. ")
     end
     answer == 2
   end
@@ -186,7 +193,7 @@ class Dealer < Player
   end
 
   def set_name
-    self.name = ["Abed", "Troy", "Jeff", "Britta", "Annie", "Shirley", "Pierce"].sample
+    self.name = %w(Abed Troy Jeff Britta Annie Shirley Pierce).sample
   end
 end
 
@@ -267,45 +274,46 @@ class Game
   end
 
   def display_game_outcome
-    puts  case @outcome
-          when :human_blackjack then "Blackjack!!! You win!!!"
-          when :human_bust then "You Bust!!!"
-          when :dealer_blackjack then "The Dealer has Blackjack. The Dealer Wins."
-          when :dealer_bust then "The Dealer Busts! You win!!!"
-          when :human_win then "You win!!!"
-          when :dealer_win then "The Dealer wins."
-          when :push then "Push."
-          end
+    possible_outcomes = {
+      human_blackjack: "Blackjack!!! You win!!!",
+      human_bust: "You Bust!!!",
+      dealer_blackjack: "The Dealer has Blackjack. The Dealer Wins.",
+      dealer_bust: "The Dealer Busts! You win!!!",
+      human_win: "You win!!!",
+      dealer_win: "The Dealer wins.",
+      push: "Push."
+    }
+
+    puts possible_outcomes[@outcome]
   end
 
   def determine_game_winner
     case @outcome
-    when :human_blackjack, :dealer_bust, :human_win then :human
-    when :human_bust, :dealer_blackjack, :dealer_win then :dealer
+    when :human_blackjack, :dealer_bust, :human_win   then human
+    when :human_bust, :dealer_blackjack, :dealer_win  then dealer
     end
   end
 
   def keep_score
-    case determine_game_winner
-    when :human then human.update_match_score
-    when :dealer then dealer.update_match_score
-    end
+    determine_game_winner.update_match_score
   end
 
-    def display_score
+  def display_score
     puts "#{human.player_score} ||| #{dealer.player_score}"
   end
 
   def display_table(face_up = true, show_score = true)
-    show_score ? dealer_total = dealer.hand.score : dealer_total = '??'
+    dealer_hand = dealer.hand
+    human_hand = human.hand
+    show_score ? dealer_total = dealer_hand.score : dealer_total = '??'
 
     clear_screen
     display_score
-    dealer.hand.show_cards(face_up)
+    dealer_hand.show_cards(face_up)
     puts "#{dealer.name}'s Total: #{dealer_total}"
     puts "-------------------------------"
-    puts "#{human.name}'s Total: #{human.hand.score}"
-    human.hand.show_cards
+    puts "#{human.name}'s Total: #{human_hand.score}"
+    human_hand.show_cards
   end
 end
 
@@ -354,15 +362,15 @@ class Match
     answer = nil
 
     loop do
-      puts "How many games needed to win the match?"
+      puts "\nHow many games needed to win the match?"
       answer = gets.chomp.strip
 
       break if answer =~ /^[0-9]+$/ && answer.to_i > 0
 
-      if answer.to_i == 0
-        puts "You have to play at least one game."
+      if answer =~ /^[0-9]+$/ && answer.to_i == 0
+        puts clear_input(2, "You have to play at least one game.")
       else
-        puts "Invalid Entry."
+        puts clear_input(2, "Invalid Entry.")
       end
     end
 
@@ -399,7 +407,7 @@ class Match
       puts "Would you like to play again? (y/n)"
       answer = gets.chomp
       break if ['y', 'n'].include?(answer)
-      puts "Invalid Entry."
+      print clear_input(2, "Invalid Entry. ")
     end
 
     answer.downcase == 'y'
@@ -423,4 +431,3 @@ class Match
 end
 
 Match.new(Shoe.new).play
-
