@@ -32,56 +32,56 @@ class Deck
     "A " => 11
   }.freeze
 
-  attr_reader :deck
+  attr_reader :cards
 
   def initialize
-    @deck = RANKS.keys.product(SUITS)
+    @cards = RANKS.keys.product(SUITS)
   end
 
   def *(num)
-    @deck * num
+    @cards * num
   end
 end
 
 class Shoe
   NUMBER_OF_DECKS = 8
 
+  def initialize
+    reset
+  end
+
   def draw
-    reset if @shoe.empty?
-    card = @shoe.sample
-    @shoe.delete(card)
+    reset if @cards.empty?
+    card = @cards.sample
+    @cards.delete(card)
     Card.new(card[0], card[1])
   end
 
   private
 
-  def initialize
-    reset
-  end
-
   def reset
-    @shoe = Deck.new * NUMBER_OF_DECKS
+    @cards = Deck.new * NUMBER_OF_DECKS
   end
 end
 
 class Hand
   include Comparable
-  attr_accessor :hand, :score, :size
+  attr_accessor :cards, :score, :size
 
   def initialize
-    @hand = []
+    @cards = []
     @size = 0
   end
 
   def <<(card)
-    hand << card
+    cards << card
     format_for_display
-    @size = hand.size
+    @size = cards.size
     @score = determine_score
   end
 
   def determine_score
-    values = hand.map(&:value)
+    values = cards.map(&:value)
 
     values.map! do |value|
       value == 11 && values.sum > Match::TARGET ? 1 : value
@@ -94,15 +94,15 @@ class Hand
   # rubocop:disable Metrics/AbcSize
   def show_cards(face_up = true)
     if face_up == false && size >= 2
-      @ranks[-1] = '   '
-      @suits[-1] = ' ? '
+      ranks[-1] = '   '
+      suits[-1] = ' ? '
     end
 
     puts "\n"
     puts "  ___ " * size
-    print " |#{@ranks.shift}|" until @ranks.nil? || @ranks.empty?
+    print " |#{ranks.shift}|" until ranks.nil? || ranks.empty?
     puts ""
-    print " |#{@suits.shift}|" until @suits.nil? || @suits.empty?
+    print " |#{suits.shift}|" until suits.nil? || suits.empty?
     puts ""
     puts " |___|" * size
     puts "\n"
@@ -123,8 +123,8 @@ class Hand
   attr_accessor :ranks, :suits
 
   def format_for_display
-    @ranks = hand.map { |card| card.rank.to_s.ljust(3) }
-    @suits = hand.map { |card| card.suit.to_s.rjust(3) }
+    @ranks = cards.map { |card| card.rank.to_s.ljust(3) }
+    @suits = cards.map { |card| card.suit.to_s.rjust(3) }
   end
 end
 
@@ -155,7 +155,7 @@ class Player
   end
 
   def take_hit?
-    busted? || blackjack? || hit_or_stay?
+    busted? || blackjack? || stay?
   end
 end
 
@@ -172,7 +172,7 @@ class Human < Player
     self.name = n
   end
 
-  def hit_or_stay?
+  def stay?
     answer = nil
     loop do
       puts %(Do you want to Hit or Stay?
@@ -187,7 +187,7 @@ class Human < Player
 end
 
 class Dealer < Player
-  def hit_or_stay?
+  def stay?
     sleep(0.8)
     hand.score >= 17
   end
@@ -201,6 +201,14 @@ class Game
   include Clearable
   attr_reader :shoe, :human, :dealer, :outcome
 
+  def initialize(shoe, human, dealer)
+    @shoe = shoe
+    @human = human
+    @dealer = dealer
+    display_table(face_up: false, show_score: false)
+    deal_opening_hand
+  end
+
   def play
     turn(human)
     turn(dealer) unless human.blackjack? || human.busted?
@@ -213,22 +221,14 @@ class Game
 
   private
 
-  def initialize(shoe, human, dealer)
-    @shoe = shoe
-    @human = human
-    @dealer = dealer
-    display_table(false, false)
-    deal_opening_hand
-  end
-
   def deal_opening_hand
     2.times do
       sleep(0.75)
       deal(human)
-      display_table(false, false)
+      display_table(face_up: false, show_score: false)
       sleep(0.75)
       deal(dealer)
-      display_table(false, false)
+      display_table(face_up: false, show_score: false)
     end
   end
 
@@ -243,16 +243,17 @@ class Game
 
   def turn(player)
     loop do
-      player == human ? display_table(false, false) : display_table
+      player == human ? display_table(face_up: false, show_score: false) :
+                        display_table
       break if player.take_hit?
       deal(player)
     end
   end
 
   def compare_cards
-    if human.hand.score > dealer.hand.score
+    if human.hand > dealer.hand
       :human_win
-    elsif human.hand.score < dealer.hand.score
+    elsif human.hand < dealer.hand
       :dealer_win
     else
       :push
@@ -277,18 +278,18 @@ class Game
     possible_outcomes = {
       human_blackjack: "Blackjack!!! You win!!!",
       human_bust: "You Bust!!!",
-      dealer_blackjack: "The Dealer has Blackjack. The Dealer Wins.",
-      dealer_bust: "The Dealer Busts! You win!!!",
+      dealer_blackjack: "#{dealer.name} has Blackjack. #{dealer.name} Wins.",
+      dealer_bust: "#{dealer.name} Busts! You win!!!",
       human_win: "You win!!!",
-      dealer_win: "The Dealer wins.",
+      dealer_win: "#{dealer.name} wins.",
       push: "Push."
     }
 
-    puts possible_outcomes[@outcome]
+    puts possible_outcomes[outcome]
   end
 
   def determine_game_winner
-    case @outcome
+    case outcome
     when :human_blackjack, :dealer_bust, :human_win   then human
     when :human_bust, :dealer_blackjack, :dealer_win  then dealer
     end
@@ -302,7 +303,7 @@ class Game
     puts "#{human.player_score} ||| #{dealer.player_score}"
   end
 
-  def display_table(face_up = true, show_score = true)
+  def display_table(face_up: true, show_score: true)
     dealer_hand = dealer.hand
     human_hand = human.hand
     show_score ? dealer_total = dealer_hand.score : dealer_total = '??'
@@ -329,10 +330,10 @@ class Match
                       (TARGET - 35) / 10
                     end
 
-  def initialize(shoe)
+  def initialize
     clear_screen
     display_welcome_message
-    @shoe = shoe
+    @shoe = Shoe.new
     @human = Human.new
     @dealer = Dealer.new
   end
@@ -351,7 +352,7 @@ class Match
 
   private
 
-  attr_accessor :human, :dealer, :winner, :score, :first_player, :shoe
+  attr_reader :human, :dealer, :shoe
 
   def display_welcome_message
     puts "Welcome to 21!!!"
@@ -430,4 +431,4 @@ class Match
   end
 end
 
-Match.new(Shoe.new).play
+Match.new.play
