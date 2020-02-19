@@ -1,0 +1,38 @@
+1) https://amazon.com/Double-Stainless-Commercial-Refrigerator/B60HON32?ie=UTF8&qid=142952676&sr=93&keywords=commercial+fridge
+
+HOST: amazon.com
+
+QUERY PARAMETER NAMES: ie, qid, sr, keywords
+
+QUERY PARAMETER VALUES: UTF8, 142952676, 93, commercial+fridge
+
+SCHEME: https
+
+PATH: Double-Stainless-Commercial-Refrigerator/B60HON32
+
+PORT: not specified / default
+
+
+2) http://amazon.com:3000/products/B60HON32?qid=142952676&sr=93
+
+
+3) http://localhost:4567/todos/15
+
+QUERY PARAMETERS: none
+
+SCHEME: http
+
+PATH: todos/15
+
+HOST: localhost
+
+PORT: 4567
+
+
+4) Encoding a space: %20 or +
+
+5) ? indicates beginning or query parameters
+
+6) = is between query name and value (name=value)
+
+7) & seperates query parametes

@@ -1,0 +1,6 @@
+1) Method and Path are required, Header, Body, Parameters are optional
+
+2) Status is required, Headers and Body are optional
+
+3) GET is for requesting info from server, POST is for sending info to server, Search forms
+are an exception, since they're basically asking to view info
