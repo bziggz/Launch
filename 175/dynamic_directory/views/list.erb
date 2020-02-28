@@ -1,0 +1,15 @@
+<ul>
+  <% @files.each do |file| %>
+    <li>
+      <a href="<%= file %>"><%= file %></a>
+    </li>
+  <% end %>
+</ul>
+
+<p>
+  <% if params[:sort] == "desc" %>
+    <a href="/">Sort Ascending<</a>
+  <% else %>
+    <a href="/?sort=desc">Sort Descending</a>
+  <% end %>
+</p>
