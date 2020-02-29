@@ -1,5 +1,5 @@
 require "sinatra"
-require "sinatra/reloader"
+require "sinatra/reloader" if development?
 require "tilt/erubis"
 
 before do 
@@ -36,7 +36,7 @@ end
 helpers do 
 
   def in_paragraphs(text)
-    text.split("\n\n").each_with_index do |line, index|
+    text.split("\n\n").each_with_index.map do |line, index|
       "<p id=paragraph#{index}>#{line}</p>"
     end.join
   end

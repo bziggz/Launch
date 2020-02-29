@@ -1,0 +1,10 @@
+Gemfile - Server-side - it helps to install the libraries needed to run the program
+
+.rb  - Server-side - the program being run on the server
+
+.css - client-side - these format the display of the information on the client
+
+.js - client-side - this is code that executes on the client
+
+.erb - server-side - helps to generate the response 
+ 
