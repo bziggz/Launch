@@ -165,7 +165,3 @@ var setScope = function () {
 /* 
 outer
 setScope is not a function */
-
-
-
-
