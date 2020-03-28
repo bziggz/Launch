@@ -1,4 +1,4 @@
-const cypher = 'abcdefghijklmnopqrstuvwxyz';
+const alphas = 'abcdefghijklmnopqrstuvwxyz';
 
 const encode = (char, cypher, key) => {
   const newIndex = (cypher.indexOf(char) + key) % cypher.length;
@@ -14,7 +14,7 @@ const rot13 = (string) => {
     const char = string[i].toLowerCase();
     const isUpperCase = char.toUpperCase() === string[i];
 
-    const newChar = cypher.includes(char) ? encode(char, cypher, key) : char;
+    const newChar = alphas.includes(char) ? encode(char, alphas, key) : char;
 
     result += isUpperCase ? newChar.toUpperCase() : newChar;
   }
