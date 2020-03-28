@@ -1,9 +1,9 @@
 const alphas = 'abcdefghijklmnopqrstuvwxyz';
 
-const encode = (char, cypher, key) => {
-  const newIndex = (cypher.indexOf(char) + key) % cypher.length;
+const encode = (char, cipher, key) => {
+  const newIndex = (cipher.indexOf(char) + key) % cipher.length;
 
-  return cypher[newIndex];
+  return cipher[newIndex];
 };
 
 const rot13 = (string) => {
