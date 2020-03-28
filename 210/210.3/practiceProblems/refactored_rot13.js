@@ -1,9 +1,15 @@
 const alphas = 'abcdefghijklmnopqrstuvwxyz';
 
 const encode = (char, cipher, key) => {
-  const newIndex = (cipher.indexOf(char) + key) % cipher.length;
+  if (cipher.includes(char)) {
+    const index = cipher.indexOf(char);
 
-  return cipher[newIndex];
+    const newIndex = (index + key) % cipher.length;
+
+    return cipher[newIndex];
+  }
+
+  return char;
 };
 
 const rot13 = (string) => {
@@ -14,7 +20,7 @@ const rot13 = (string) => {
     const char = string[i].toLowerCase();
     const isUpperCase = char.toUpperCase() === string[i];
 
-    const newChar = alphas.includes(char) ? encode(char, alphas, key) : char;
+    const newChar = encode(char, alphas, key);
 
     result += isUpperCase ? newChar.toUpperCase() : newChar;
   }
