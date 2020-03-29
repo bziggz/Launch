@@ -18,9 +18,10 @@ const rot13 = (string) => {
 
   for (let i = 0; i < string.length; i += 1) {
     const char = string[i].toLowerCase();
-    const isUpperCase = char.toUpperCase() === string[i];
 
     const newChar = encode(char, alphas, key);
+
+    const isUpperCase = char.toUpperCase() === string[i];
 
     result += isUpperCase ? newChar.toUpperCase() : newChar;
   }
