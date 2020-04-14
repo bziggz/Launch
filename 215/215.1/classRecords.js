@@ -11,7 +11,7 @@ const sumScores = (accumulator, score) => accumulator + score;
 // Parse and Format Student Information
 
 const averageExamScorePerStudent = (student) => (
-  student.scores.exams.reduce(sumScores, 0) / student.scores.exams.length
+  student.scores.exams.reduce(sumScores, 0) / numberOfExams
 );
 
 const totalExerciseScores = (student) => (
