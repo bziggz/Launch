@@ -4,9 +4,11 @@ const examWeight = 0.65;
 const exerciseWeight = 0.35;
 const numberOfExams = 4;
 
-// Parse and Format Student Information
+// Universal Functions
 
 const sumScores = (accumulator, score) => accumulator + score;
+
+// Parse and Format Student Information
 
 const averageExamScorePerStudent = (student) => (
   student.scores.exams.reduce(sumScores, 0) / student.scores.exams.length
@@ -57,18 +59,15 @@ const gatherScoresPerExam = (scores) => {
   return scoresPerExam;
 };
 
-const averageScorePerExam = (exam) => 
-  Number((exam.reduce(sumScores, 0) / exam.length).toFixed(2));
-
-const minimumScorePerExam = (examScores) => Math.min(...examScores);
-
-const maximumScorePerExam = (examScores) => Math.max(...examScores);
+const averageScorePerExam = (exam) => (
+  Number((exam.reduce(sumScores, 0) / exam.length).toFixed(2))
+);
 
 const generateExamSummary = (exam) => (
   {
     average: averageScorePerExam(exam),
-    minimum: minimumScorePerExam(exam),
-    maximum: maximumScorePerExam(exam),
+    minimum: Math.min(...exam),
+    maximum: Math.max(...exam),
   }
 );
 
