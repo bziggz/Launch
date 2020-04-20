@@ -28,13 +28,15 @@ let longText = 'Four score and seven years ago our fathers brought forth' +
   ' the people, for the people, shall not perish from the' +
   ' earth.';
 
-const longestSentence = (text) => {
-  const sentencesByLengthDescending = text.match(/\b.*?[.!?]+/g) // Regex creates trimmed sentences seperated by any qty '.', '!', '?'
+const sortSentencesByLengthDescending = (text) => (
+  text.match(/\b.*?[.!?]+/g)
     .sort((sentence1, sentence2) => (
       sentence2.split(/[\s]/).length - sentence1.split(/[\s]/).length
-    ));
+    ))
+);
 
-  const longest = sentencesByLengthDescending[0];
+const longestSentence = (text) => {
+  const longest = sortSentencesByLengthDescending(text)[0];
 
   console.log(longest);
   console.log(`\nThe longest sentence has ${longest.split(' ').length} words.`);
