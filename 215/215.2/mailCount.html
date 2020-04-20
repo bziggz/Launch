@@ -1,0 +1,18 @@
+<script src="https://dbdwvr6p7sskw.cloudfront.net/210/files/email_data_v2.js"></script>
+<script>
+  const mailCount = (emailData) => {
+    const emailArray = emailData.split('##||##') // split seperate emails
+      .map((email) => email.split('#/#')[2]) // split email data parts
+      .flatMap((date) => date.match(/\d{2}-\d{2}-\d{4}/)) // parse date
+      .map((date) => new Date(date)).sort((a, b) => a - b) // create date objects and sort
+      .flatMap((date) => String(date).match(/[a-z]{3} [a-z]{3} \d{2} \d{4}/i)); // convert date objects to desired format
+
+    const startDate = emailArray[1]; // oldest date
+    const endDate = emailArray[emailArray.length - 1] // most recent date
+
+    console.log(`Count of Email: ${emailArray.length}`);
+    console.log(`Date Range: ${startDate} - ${endDate}`);
+  };
+
+  mailCount(emailData);
+</script>
