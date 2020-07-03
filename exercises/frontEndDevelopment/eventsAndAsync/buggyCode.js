@@ -1,0 +1,1 @@
+// the code should have event.preventDefault() instead of event.stopPropagation()
