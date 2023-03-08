@@ -6,7 +6,7 @@ gem "sinatra", "2.0.8.1"
 gem "sinatra-contrib"
 gem "erubis"
 gem "bcrypt"
-gem "rack", "2.2.3"
+gem "rack", "2.2.6.3"
 gem "rack-protection", ">= 1.5.5"
 
 gem "minitest"
